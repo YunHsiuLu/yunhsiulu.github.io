@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YunHsiuLu 的個人網站</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-color: #f6f9f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        header {
+            margin-bottom: 20px;
+            width: 100%;
+            text-align: center;
+            position: absolute;
+            top: 20px;
+        }
+        h1 {
+            color: #444;
+        }
+        .photo {
+            width: 300px;
+            height: 500px;
+            background-color: #ddd;
+            margin: 50px auto;
+            overflow: hidden;
+        }
+        .photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        aside {
+            width: 150px;
+            height: 100%;
+            background-color: #fff;
+            border-left: 5px solid #ccc;
+            transition: width 0.3s;
+            position: fixed;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        aside:hover {
+            width: 300px;
+        }
+        .tags {
+            list-style-type: none;
+            padding: 10px;
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 180px;
+            text-align: left;
+        }
+        .tags li {
+            margin-bottom: 20px; /* 增加間距 */
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        aside:hover .tags li {
+            opacity: 1;
+        }
+        .tags a {
+            display: block; /* 整條可點選 */
+            text-decoration: none;
+            color: #333;
+            background-color: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            width: 300px;
+            transition: background-color 0.3s;
+        }
+        .tags a:hover {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <header>
+            <h1>歡迎來到 YunHsiuLu 的網站</h1>
+        </header>
+        <div>
+            <div class="photo">
+                <!-- 將您的照片路徑放入 src 中 -->
+                <img src="./Personal-Photo.jpeg" alt="您的照片">
+            </div>
+            <p>這裡是 YunHsiuLu 的個人網站，歡迎您的到來！</p>
+        </div>
+    </main>
+
+    <aside>
+        <ul class="tags">
+            <li><a href="personal-info.html">個人資料</a></li>
+            <li><a href="portfolio.html">作品集</a></li>
+            <li><a href="teaching.html">教學活動</a></li>
+            <li><a href="admin-experience.html">行政經驗</a></li>
+            <li><a href="class-management.html">班級經營</a></li>
+            <li><a href="future-aspirations.html">未來期許</a></li>
+            <li><a href="certificates.html">相關證書</a></li>
+        </ul>
+    </aside>
+</body>
+</html>
+
