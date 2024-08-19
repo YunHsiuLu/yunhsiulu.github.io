@@ -54,6 +54,15 @@ function draw() {
     ctx.strokeStyle = 'black';
     ctx.stroke();
 
+    // Draw the normal dash line
+    ctx.beginPath();
+    ctx.setLineDash([10, 10]);
+    ctx.moveTo(canvas.width / 2, 0);
+    ctx.lineTo(canvas.width / 2, canvas.height);
+    ctx.strokeStyle = 'black';
+    ctx.stroke();
+    ctx.setLineDash([]);
+
     // Draw the incident ray from bluePoint to the interface
     ctx.beginPath();
     ctx.moveTo(bluePoint.x, bluePoint.y);
@@ -80,6 +89,7 @@ function draw() {
     if ((Math.abs(Math.sin(incidentAngle) - 1 / n1) <= 0.01) && (n1 > n2)) {
         isGreen = 0;
         x3 = canvas.width;
+        if (bluePoint.x > x2) x3 = 0;
         y3 = y2;
     }
     else if (Math.sin(incidentAngle) > 1 / n1 && n1 > n2) {
@@ -91,20 +101,18 @@ function draw() {
         if (bluePoint.y < y2) {
             y3 = canvas.height * 3 / 4;
             x3 = x2 + Math.pow(-1, (bluePoint.x > x2)) * (y3 - y2) * Math.tan(refractedAngle);
-
-            y4 = y2 + (y3 - y2) * n1 / n2;
-            if (incidentAngle != 0) y4 = y2 + Math.pow(-1, (bluePoint.y > y2)) * (y3 - y2) * Math.tan(refractedAngle) / Math.tan(incidentAngle);
-            x4 = x2 + Math.pow(-1, (bluePoint.x > x2)) * (y4 - y2) * Math.tan(incidentAngle);
-
         }
         else if (bluePoint.y > y2) {
             y3 = canvas.height * 3 / 7;
             x3 = x2 + Math.pow(-1, (bluePoint.x < x2)) * (y3 - y2) * Math.tan(refractedAngle);
-
-            y4 = y2 + (y3 - y2) * n1 / n2;
-            if (incidentAngle != 0) y4 = y2 + Math.pow(-1, (bluePoint.y < y2)) * (y3 - y2) * Math.tan(refractedAngle) / Math.tan(incidentAngle);
-            x4 = x2 + Math.pow(-1, (bluePoint.x < x2)) * (y4 - y2) * Math.tan(incidentAngle);
         }
+
+        const n12 = n2 / n1;
+        const R = Math.pow(Math.pow(n12, 2)- Math.pow(Math.sin(incidentAngle), 2), 1.5);
+        const h = Math.abs(y3 - y2);
+
+        x4 = x2 + Math.pow(-1, (bluePoint.x > x2)) * h * Math.sin(incidentAngle) * Math.pow(Math.cos(incidentAngle), 2) * Math.pow(n12, 2) / R;
+        y4 = y2 + Math.pow(-1, (bluePoint.y > y2)) * h * Math.pow(Math.cos(incidentAngle), 3) * Math.pow(n12, 2) / R;
     }
 
     // Update red point position
