@@ -1,0 +1,55 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    font-size: 20px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.back-button:hover {
+    background-color: #0056b3;
+}
+.arrow {
+    margin-right: 5px;
+    font-size: 20px;
+}
+
+canvas {
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#frequencySlider, #waveCountSlider {
+    margin-left: 10px;
+    margin-right: 10px;
+    width: 200px;
+}
