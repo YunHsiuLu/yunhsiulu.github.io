@@ -70,7 +70,7 @@ function drawWave() {
 }
 
 frequencySlider.addEventListener('input', () => {
-    frequencyValue.textContent = frequencySlider.value;
+    frequencyValue.textContent = Number(frequencySlider.value).toFixed(1);
 });
 
 waveCountSlider.addEventListener('input', () => {
@@ -78,4 +78,5 @@ waveCountSlider.addEventListener('input', () => {
 });
 
 drawWave();
+
 
