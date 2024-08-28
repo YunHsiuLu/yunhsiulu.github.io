@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concave & convex mirror reflactive simulation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+    <h1>Concave & convex mirror reflactive simulation</h1>
+    <div class="controls">
+        <label for="mirrorType">Choose mirror type:</label>
+        <select id="mirrorType">
+            <option value="concave">concave</option>
+            <option value="convex">convex</option>
+        </select>
+        <label for="objectDistance">Object Distance (cm):</label>
+        <input type="range" id="objectDistance" min="5" max="400" value="200" step="5">
+        <span id="objectDistanceValue">200</span>
+    </div>
+    <div class="simulation">
+        <canvas id="mirrorCanvas"></canvas>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
