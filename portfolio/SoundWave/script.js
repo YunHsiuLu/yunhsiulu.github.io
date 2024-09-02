@@ -7,8 +7,8 @@ canvas.width = 800;
 canvas.height = 400;
 
 let particles = [];
-const waveLength = 50;
-const waveAmplitude = waveLength / 2;
+const waveLength = 100;
+const waveAmplitude = waveLength / 5;
 const rows = 12;
 const cols = 100;
 const particleCount = rows * cols;
@@ -33,11 +33,18 @@ function animateParticles() {
     const waveFrequency = frequencySlider.value;
     const speed = 50;
     const t = frame / speed;
+    
     particles.forEach((particle, index) => {
+        let dot_radius = 3;
+        let dot_color = '#34a0bd';
         particle.x = particle.originalX + Math.sin(waveFrequency * (t - Math.floor(index/rows) / 10)) * waveAmplitude;
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, 3, 0, Math.PI * 2, false);
-        ctx.fillStyle = '#3498db';
+        if (600 <= index && index < 612) {
+            dot_radius = 5;
+            dot_color = '#dd4a55';
+        }
+        ctx.arc(particle.x, particle.y, dot_radius, 0, Math.PI * 2, false);
+        ctx.fillStyle = dot_color;
         ctx.fill();
         ctx.closePath();
     });

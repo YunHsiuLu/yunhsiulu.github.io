@@ -1,11 +1,12 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
-    margin: 0;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
+    justify-content: center;
     height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
 }
 
 .back-button {
@@ -38,7 +39,6 @@ body {
 }
 
 h1 {
-    color: #333;
     margin-bottom: 20px;
 }
 
