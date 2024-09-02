@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聲波振動示意圖</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+    <div id="container">
+        <h1>聲波在空氣分子中的縱波振動</h1>
+        <div id="canvasWrapper">
+            <canvas id="waveCanvas"></canvas>
+        </div>
+        <div class="slider-container">
+            <label for="frequencySlider">Wave Frequency: </label>
+            <input type="range" id="frequencySlider" min="1" max="7" step="1" value="3">
+        <span id="frequencyValue">3</span>
+    </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
