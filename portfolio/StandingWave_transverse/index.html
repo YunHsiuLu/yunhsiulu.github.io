@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standing Wave Simulation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+    <h1>Standing Wave Simulation with Nodes and Antinodes</h1>
+    <canvas id="waveCanvas"></canvas>
+    <div class="slider-container">
+        <label for="frequencySlider">Angular Frequency: </label>
+        <input type="range" id="frequencySlider" min="1.0" max="8.0" step="0.1" value="2">
+        <span id="frequencyValue">2</span>
+    </div>
+    <div class="slider-container">
+        <label for="waveCountSlider">Number of Waves: </label>
+        <input type="range" id="waveCountSlider" min="1" max="10" step="1" value="1">
+        <span id="waveCountValue">1</span>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
