@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulation of Lissajous</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html" class="back-button">
+        <span class="arrow">←</span> Back
+    </a>
+    <h1>Simulation of Lissajous</h1>
+    <div class="controls">
+        <div class="controls-row">
+            <label for="freqX">Frequency in X direction:</label>
+            <input type="number" id="freqX" min="1" max="10" value="5">
+            
+            <label for="freqY">Frequency in Y direction:</label>
+            <input type="number" id="freqY" min="1" max="10" value="4">
+        </div>
+        <!-- Slider to display and control the phase shift -->
+        <div class="controls-row">
+            <label for="phaseSlider">Phase Shift (radians):</label>
+            <input type="range" id="phaseSlider" min="0" max="6.28" step="0.01" value="0">
+            <span id="phaseValue">0</span>
+        </div>
+    </div>
+    <canvas id="lissajousCanvas" width="600" height="600"></canvas>
+    <script src="script.js"></script>
+</body>
+</html>
+

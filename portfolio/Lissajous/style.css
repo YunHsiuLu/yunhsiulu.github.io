@@ -1,0 +1,59 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    font-size: 20px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+.back-button:hover {
+    background-color: #0056b3;
+}
+.arrow {
+    margin-right: 5px;
+    font-size: 20px;
+}
+
+.controls {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* New CSS to align two controls horizontally */
+.control-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%; /* Adjust the width as needed */
+    max-width: 600px; /* Limit the width to the container size */
+}
+
+.controls label, .controls input {
+    margin: 5px 0;
+}
+
+#lissajousCanvas {
+    border: 1px solid #000;
+    background-color: #fff;
+}
+
