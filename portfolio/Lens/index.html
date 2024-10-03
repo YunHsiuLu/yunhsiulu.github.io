@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凹透鏡模擬</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body onload="initializeSimulation()">
+    <a href="../index.html" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+    <h1>凹透鏡模擬</h1>
+    <div class="container">
+        <div class="lens-simulation">
+            <svg id="lens-simulator" width="500" height="300">
+                <!-- 正確的凹透鏡形狀 -->
+                <path d="M 200,0 C 220,150 220,150 200,300 M 300,0 C 280,150 280,150 300,300" stroke="black" fill="none" stroke-width="3"></path>
+                
+                <!-- 水平線 -->
+                <line id="horizontal-line" x1="0" y1="150" x2="500" y2="150" stroke="gray" stroke-width="2"></line>
+                
+                <!-- 刻度，起點從透鏡邊緣開始，單位為公分 -->
+                <g id="scale"></g>
+
+                <!-- 物體，從透鏡左側邊界開始 -->
+                <line id="object" x1="200" y1="150" x2="200" y2="50" stroke="blue" stroke-width="4"></line>
+                
+                <!-- 成像，虛像且與物體保持相同方向 -->
+                <line id="image" x1="400" y1="150" x2="400" y2="250" stroke="red" stroke-width="4"></line>
+            </svg>
+        </div>
+        <div class="slider-container">
+            <label for="distance-slider">物距 (u) (cm): </label>
+            <!-- 滑桿最小值設為0，最大值設為透鏡左側到視窗左邊框的距離 -->
+            <input type="range" id="distance-slider" min="0" max="100" value="0" step="1" oninput="updateSimulation()">
+            <span id="distance-value">0.00 cm</span>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
