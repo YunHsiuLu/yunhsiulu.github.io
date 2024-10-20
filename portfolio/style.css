@@ -16,7 +16,7 @@
         padding: 20px;
     }
     .gallery-item {
-        width: 500px;
+        width: 400px;
         text-align: center;
         margin-left: 100px;
         border-radius: 8px;
@@ -54,6 +54,21 @@
     .arrow {
         margin-right: 5px;
         font-size: 20px;
+    }
+    .other-button {
+        display: flex;
+        align-items: center;
+        position: fixed;
+        top: 90px;
+        left: 20px;
+        padding: 10px 15px;
+        font-size: 20px;
+        color: #fff;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
     }
     a {
         text-decoration: none;

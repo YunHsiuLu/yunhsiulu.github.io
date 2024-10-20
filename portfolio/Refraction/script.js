@@ -103,7 +103,7 @@ function draw() {
             x3 = x2 + Math.pow(-1, (bluePoint.x > x2)) * (y3 - y2) * Math.tan(refractedAngle);
         }
         else if (bluePoint.y > y2) {
-            y3 = canvas.height * 3 / 7;
+            y3 = canvas.height * 1 / 4;
             x3 = x2 + Math.pow(-1, (bluePoint.x < x2)) * (y3 - y2) * Math.tan(refractedAngle);
         }
 
