@@ -82,12 +82,25 @@ aside {
 .arrow {
     font-size: 24px;
     color: #007BFF;
-    transition: opacity 0.3s;
     margin-top: 20px;
+    cursor: pointer;
+    transition: width 0.3s, height 0.3s; /* 添加平滑過渡 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0; /* 可選：給箭頭按鈕增加背景以更明顯 */
+    border-radius: 5px; /* 可選：圓角 */
+    width: 80px;
+    height: 30px;
+}
+aside[style*="width: 300px"] .arrow {
+    width: 280px; /* 側邊欄展開時箭頭的寬度 */
+    height: 50px; /* 可選：擴大按鈕高度 */
 }
 
-aside:hover .arrow {
-    opacity: 0;
+aside[style*="width: 100px"] .arrow {
+    width: 80px; /* 側邊欄收起時箭頭的寬度 */
+    height: 30px; /* 可選：縮小按鈕高度 */
 }
 
 .tags-title {
@@ -105,15 +118,6 @@ aside:hover .arrow {
     margin-top: 20px;
 }
 
-aside:hover .tags-title {
-    opacity: 1;
-    background-color: #0056b3;
-}
-
-aside:hover {
-    width: 300px;
-}
-
 .tags {
     list-style-type: none;
     padding: 10px;
@@ -123,14 +127,23 @@ aside:hover {
     margin-top: 20px;
 }
 
+.tags-title, .tags li {
+    opacity: 0;
+    pointer-events: none; /* 禁止點擊 */
+    transition: opacity 0.3s, pointer-events 0s 0.3s; /* 延遲恢復點擊，與透明度動畫同步 */
+}
+
+aside[style*="width: 300px"] .tags-title,
+aside[style*="width: 300px"] .tags li {
+    opacity: 1;
+    pointer-events: auto; /* 啟用點擊 */
+    transition: opacity 0.3s;
+}
+
 .tags li {
     margin-bottom: 20px;
     opacity: 0;
     transition: opacity 0.3s;
-}
-
-aside:hover .tags li {
-    opacity: 1;
 }
 
 .tags a {
@@ -144,8 +157,3 @@ aside:hover .tags li {
     transition: background-color 0.3s;
     box-sizing: border-box;
 }
-
-.tags a:hover {
-    background-color: #ccc;
-}
-

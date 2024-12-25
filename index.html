@@ -19,8 +19,8 @@
         </div>
     </main>
 
-    <aside>
-        <div class="arrow">➔</div>
+    <aside id="sidebar">
+        <div class="arrow" onclick="toggleSidebar()">➔</div>
         <div class="tags-title">列表</div>
         <ul class="tags">
             <li><a href="personal-info/index.html">個人資料</a></li>
@@ -32,6 +32,32 @@
             <li><a href="certificates/index.html">相關證書</a></li>
         </ul>
     </aside>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const tagsTitle = document.querySelector('.tags-title');
+            const tagsItems = document.querySelectorAll('.tags li');
+
+            if (sidebar.style.width === '300px') {
+                // 收起側邊欄
+                sidebar.style.width = '100px';
+                tagsTitle.style.pointerEvents = 'none';
+                tagsItems.forEach(item => {
+                    item.style.pointerEvents = 'none';
+                });
+            } else {
+                // 展開側邊欄
+                sidebar.style.width = '300px';
+                tagsTitle.style.pointerEvents = 'auto';
+                tagsItems.forEach(item => {
+                    item.style.pointerEvents = 'auto';
+                });
+            }
+        }
+    </script>
+
+
 </body>
 </html>
 
