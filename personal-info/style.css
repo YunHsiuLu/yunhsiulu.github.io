@@ -7,7 +7,7 @@
         background-color: #f4f4f9;
     }
     .container {
-        max-width: 800px;
+        max-width: 600px;
         margin: 20px auto;
         padding: 20px;
         background-color: #ffffff;
@@ -16,13 +16,14 @@
         position: relative;
     }
     h1, h2 {
+        word-wrap: break-word;
         color: #333;
     }
     .profile-pic {
         width: 500px;
         height: 300px;
         object-fit: cover;
-        position: absolute;
+        position: flex;
         top: 20px;
         right: 20px;
         border-radius: 10px;
@@ -45,6 +46,7 @@
         border-radius: 5px;
         cursor: pointer;
         text-decoration: none;
+        z-index: 1000;
     }
     .back-button:hover {
         background-color: #0056b3;
