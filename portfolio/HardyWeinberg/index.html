@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particle Simulation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html#LI" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+    <div class="main-container">
+        <div class="top-container">
+            <canvas id="simulationCanvas"></canvas>
+            <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+        </div>
+        <div class="controls">
+            <div>
+                <label for="numParticles">族群數量: </label>
+                <input type="range" id="numParticles" min="5" max="200" value="20">
+                <span id="numParticlesValue">20</span>
+            </div>
+            <div>
+                <label for="frequency">顯性基因T的頻率: </label>
+                <input type="range" id="frequency" min="0" max="1" step="0.01" value="0.5">
+                <span id="frequencyValue">0.5</span>
+            </div>
+        </div>
+    </div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+
