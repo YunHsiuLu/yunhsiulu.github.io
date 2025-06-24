@@ -1,8 +1,10 @@
 // react_windows.js
+import { redLineStations } from './metroLines/red/red-line';
+import { blueLineStations } from './metroLines/blue/blue-line';
 
 const interactivePoints = [
-  { x: 550, y: 1170, label: 'Taipei' },
-  { x: 180, y: 284, label: 'Tamsui' }
+  ...redLineStations,
+  ...blueLineStations,
 ];
 
 const THRESHOLD = 20;
@@ -14,9 +16,9 @@ let currentPopup = null;
 let hideTimer = null;
 let currentPoint = null;
 
-async function loadStationInfo(label) {
+async function loadStationInfo(label, color) {
   try {
-    const module = await import(`./stations/${label}.js`);
+    const module = await import(`./metroLines/${color}/${label}.js`);
     return module.default || module;
   } catch (e) {
     console.error(`無法載入 ${label}.js:`, e);
@@ -24,7 +26,7 @@ async function loadStationInfo(label) {
   }
 }
 
-async function createReactWindow(x, y, label) {
+async function createReactWindow(x, y, label, color) {
   // 如果已經有視窗，先取消延遲隱藏
   clearTimeout(hideTimer);
   // 如果已經有視窗，且不是同一個點，先隱藏
@@ -32,7 +34,7 @@ async function createReactWindow(x, y, label) {
     currentPopup.style.display = 'none';
   }
   // 載入資訊
-  const info = await loadStationInfo(label);
+  const info = await loadStationInfo(label, color);
   // 建立或更新視窗
   if (!currentPopup) {
     currentPopup = document.createElement('div');
@@ -79,7 +81,7 @@ img.addEventListener('mousemove', function(event) {
     const dx = pt.x - mouseX;
     const dy = pt.y - mouseY;
     if (Math.sqrt(dx*dx + dy*dy) < THRESHOLD) {
-      createReactWindow(pt.x, pt.y, pt.label);
+      createReactWindow(pt.x, pt.y, pt.label, pt.c);
       found = true;
       break;
     }

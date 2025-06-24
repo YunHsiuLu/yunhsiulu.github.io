@@ -1,0 +1,30 @@
+// red-line.js
+
+export const redLineStations = [
+  { x: 180, y: 284, label: "Tamsui", c: "red"},
+  { x: , y: , label: "Hongshulin", c: "red" },
+  { x: , y: , label: "Zhuwei", c: "red" },
+  { x: , y: , label: "Guandu", c: "red" },
+  { x: , y: , label: "Fuxinggang", c: "red" },
+  { x: , y: , label: "Beitou", c: "red" },
+  { x: , y: , label: "Qiyan", c: "red" },
+  { x: , y: , label: "Qilian", c: "red" },
+  { x: , y: , label: "Shipai", c: "red" },
+  { x: , y: , label: "Mingde", c: "red" },
+  { x: , y: , label: "Zhishan", c: "red" },
+  { x: , y: , label: "Shilin", c: "red" },
+  { x: , y: , label: "Jiantan", c: "red" },
+  { x: , y: , label: "Yuanshan", c: "red" },
+  { x: , y: , label: "Minquan" , c: "red"},
+  { x: , y: , label: "Shuanglian", c: "red" },
+  { x: , y: , label: "Zhongshan", c: "red" },
+  { x: 550, y: 1170, label: "Taipei", c: "red" },
+  { x: , y: , label: "NTU-Hospital", c: "red" },
+  { x: 550, y: 1270, label: "CKS", c: "red" },
+  { x: , y: , label: "Dongmen", c: "red" },
+  { x: , y: , label: "Daan-Park", c: "red" },
+  { x: , y: , label: "Daan", c: "red" },
+  { x: , y: , label: "Xinyi", c: "red" },
+  { x: , y: , label: "Taipei101", c: "red" },
+  { x: , y: , label: "Xiangshan", c: "red" }
+];
