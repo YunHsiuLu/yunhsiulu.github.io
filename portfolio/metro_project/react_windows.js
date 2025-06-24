@@ -1,19 +1,18 @@
 // react_windows.js
 import { redLineStations } from './metroLines/red/red-line.js';
 import { blueLineStations } from './metroLines/blue/blue-line.js';
+import { orangeLineStations } from './metroLines/orange/orange-line.js';
 
 const interactivePoints = [
   ...redLineStations,
-  ...blueLineStations
+  ...blueLineStations,
+  ...orangeLineStations
 ];
 
 const THRESHOLD = 20;
-const HIDE_DELAY = 300; // 延遲隱藏時間（ms）
-
 const img = document.getElementById('mrt-map');
 const windowRoot = document.getElementById('react-window-root');
 let currentPopup = null;
-let hideTimer = null;
 let currentPoint = null;
 
 async function loadStationInfo(label, color) {
@@ -27,9 +26,7 @@ async function loadStationInfo(label, color) {
 }
 
 async function createReactWindow(x, y, label, color) {
-  // 如果已經有視窗，先取消延遲隱藏
-  clearTimeout(hideTimer);
-  // 如果已經有視窗，且不是同一個點，先隱藏
+  // 若已經有視窗且不是同一個點，先隱藏
   if (currentPopup && currentPoint !== label) {
     currentPopup.style.display = 'none';
   }
@@ -47,6 +44,11 @@ async function createReactWindow(x, y, label, color) {
     currentPopup.style.boxShadow = '2px 2px 8px #aaa';
     currentPopup.style.zIndex = '10';
     windowRoot.appendChild(currentPopup);
+
+    // 點擊視窗本身時，不會關閉
+    currentPopup.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
   }
   currentPopup.innerHTML = `
     <h3>${info.title || label}</h3>
@@ -56,12 +58,6 @@ async function createReactWindow(x, y, label, color) {
   currentPopup.style.top = (y + 20) + 'px';
   currentPopup.style.display = 'block';
   currentPoint = label;
-  // 當滑鼠移到視窗上時，取消延遲隱藏
-  currentPopup.addEventListener('mouseenter', () => clearTimeout(hideTimer));
-  // 當滑鼠離開視窗時，延遲隱藏
-  currentPopup.addEventListener('mouseleave', () => {
-    hideTimer = setTimeout(hideReactWindow, HIDE_DELAY);
-  });
 }
 
 function hideReactWindow() {
@@ -71,32 +67,33 @@ function hideReactWindow() {
   }
 }
 
-img.addEventListener('mousemove', function(event) {
+// 點擊圖片時，檢查是否在任何一個站點附近
+img.addEventListener('click', function(event) {
   const rect = img.getBoundingClientRect();
-  const mouseX = event.clientX - rect.left;
-  const mouseY = event.clientY - rect.top;
+  const clickX = event.clientX - rect.left;
+  const clickY = event.clientY - rect.top;
 
   let found = false;
   for (const pt of interactivePoints) {
-    const dx = pt.x - mouseX;
-    const dy = pt.y - mouseY;
+    const dx = pt.x - clickX;
+    const dy = pt.y - clickY;
     if (Math.sqrt(dx*dx + dy*dy) < THRESHOLD) {
       createReactWindow(pt.x, pt.y, pt.label, pt.c);
       found = true;
       break;
     }
   }
-  if (!found && currentPopup) {
-    // 如果不在任何點上，且沒有滑鼠在視窗上，才延遲隱藏
-    if (!currentPopup.matches(':hover')) {
-      hideTimer = setTimeout(hideReactWindow, HIDE_DELAY);
-    }
-  }
+  if (!found) hideReactWindow();
 });
 
-img.addEventListener('mouseleave', () => {
-  if (currentPopup && !currentPopup.matches(':hover')) {
-    hideTimer = setTimeout(hideReactWindow, HIDE_DELAY);
+// 點擊文件其他地方時，隱藏視窗（但點擊視窗本身不會觸發）
+document.addEventListener('click', function(event) {
+  if (
+    currentPopup &&
+    !currentPopup.contains(event.target) &&
+    !img.contains(event.target)
+  ) {
+    hideReactWindow();
   }
 });
 

@@ -1,0 +1,27 @@
+export const orangeLineStations = [
+  { x: 510, y: 1590, label: "Nanshijiao",            c: "orange" },
+  { x: 510, y: 1530, label: "Jingan",                c: "orange" },
+  { x: 510, y: 1480, label: "Yongan",                c: "orange" },
+  { x: 510, y: 1430, label: "Dingxi",                c: "orange" },
+  { x: 595, y: 1315, label: "Guting",                c: "orange" },
+  { x: 660, y: 1077, label: "Songjiangnanjing",      c: "orange" },
+  { x: 660, y: 1010, label: "XingtianTemple",        c: "orange" },
+  { x: 622, y: 965, label: "Zhongshan-ES",          c: "orange" },
+  { x: 483, y: 965, label: "Daqiaotou",             c: "orange" },
+  { x: 408, y: 994, label: "Taipei-bridge",         c: "orange" },
+  { x: 369, y: 1034, label: "Cailiao",               c: "orange" },
+  { x: 330, y: 1073, label: "Sanchong",              c: "orange" },
+  { x: 227, y: 1123, label: "XianseTemple",          c: "orange" },
+  { x: 231, y: 1170, label: "Touqianzhuang",         c: "orange" },
+  { x: 183, y: 1218, label: "Xinzhuang",             c: "orange" },
+  { x: 141, y: 1260, label: "FuJen-University",      c: "orange" },
+  { x: 100, y: 1304, label: "Danfeng",               c: "orange" },
+  { x: 54, y: 1343, label: "Huilong",               c: "orange" },
+  { x: 394, y: 924, label: "Sanchong-ES",           c: "orange" },
+  { x: 354, y: 885, label: "Sanhe-JHS",             c: "orange" },
+  { x: 316, y: 844, label: "St-Ignatius-HS",        c: "orange" },
+  { x: 278, y: 809, label: "Sanmin-HS",             c: "orange" },
+  { x: 237, y: 769, label: "Luzhou",                c: "orange" },
+  
+];
+
