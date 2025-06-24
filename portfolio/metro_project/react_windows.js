@@ -1,10 +1,8 @@
 // react_windows.js
 import { redLineStations } from './metroLines/red/red-line.js';
-import { blueLineStations } from './metroLines/blue/blue-line.js';
 
 const interactivePoints = [
-  ...redLineStations,
-  ...blueLineStations
+  ...redLineStations
 ];
 
 const THRESHOLD = 20;
