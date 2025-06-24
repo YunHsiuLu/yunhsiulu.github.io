@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>捷運路線圖互動功能</title>
+  <style>
+    .img-container { position: relative; display: inline-block; }
+    #mrt-map { max-width: 100%; display: block; }
+    #react-window-root { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+    #react-popup {
+      position: absolute;
+      background: #fff;
+      border: 1px solid #888;
+      padding: 12px;
+      border-radius: 8px;
+      box-shadow: 2px 2px 8px #aaa;
+      z-index: 10;
+      pointer-events: auto;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="img-container">
+    <img id="mrt-map" src="metrotaipeimap.jpg" alt="台北捷運路線圖">
+    <div id="react-window-root"></div>
+  </div>
+  <script src="label_position.js"></script>
+  <script src="react_windows.js" type="module"></script>
+</body>
+</html>
+
