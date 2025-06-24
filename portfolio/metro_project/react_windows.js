@@ -3,7 +3,8 @@ import { redLineStations } from './metroLines/red/red-line.js';
 import { blueLineStations } from './metroLines/blue/blue-line.js';
 
 const interactivePoints = [
-  ...redLineStations
+  ...redLineStations,
+  ...blueLineStations
 ];
 
 const THRESHOLD = 20;
