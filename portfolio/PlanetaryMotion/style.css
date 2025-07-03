@@ -1,0 +1,179 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 20px;
+    font-size: 16px; /* Larger base font size */
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    font-size: 20px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+.arrow {
+    margin-right: 5px;
+    font-size: 20px;
+}
+
+h1 {
+    color: #00bbf9;
+    margin-bottom: 20px;
+    font-size: 2.5em; /* Larger heading */
+}
+
+.container {
+    display: flex;
+    background-color: #2a2a4a;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    flex-direction: row; /* Arrange items in a row */
+}
+
+canvas {
+    background-color: #0f0f1a;
+    border-right: 2px solid #00bbf9;
+}
+
+#simulationCanvas {
+    border-right: 2px solid #00bbf9; /* Keep border for main canvas */
+}
+
+.controls {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 450px; /* Slightly wider controls for larger fonts */
+}
+
+.slider-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.slider-group label {
+    margin-bottom: 5px;
+    color: #9bdeff;
+    font-size: 1.5em; /* Larger label font */
+}
+
+.slider-group input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 10px; /* Slightly thicker slider */
+    background: #555;
+    border-radius: 5px;
+    outline: none;
+    opacity: 0.7;
+    transition: opacity .2s;
+}
+
+.slider-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 22px; /* Larger thumb */
+    height: 22px; /* Larger thumb */
+    background: #00bbf9;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.slider-group input[type="range"]::-moz-range-thumb {
+    width: 22px;
+    height: 22px;
+    background: #00bbf9;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.slider-group span {
+    margin-top: 5px;
+    text-align: center;
+    color: #e0e0e0;
+    font-size: 1.4em; /* Larger value font */
+}
+
+.energy-display {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #00bbf9;
+    border-radius: 5px;
+    background-color: #3a3a5a;
+}
+
+.energy-display h3 {
+    color: #00bbf9;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.3em; /* Larger energy heading */
+}
+
+.energy-display p {
+    margin: 5px 0;
+    font-size: 1.5em; /* Larger energy value font */
+}
+
+button {
+    background-color: #00bbf9;
+    color: white;
+    border: none;
+    padding: 12px 18px; /* Larger button padding */
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.5em; /* Larger button font */
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0099cc;
+}
+
+.graphs-container {
+    display: flex;
+    flex-direction: column; /* Graphs stacked vertically */
+    margin-right: 20px; /* Space between graphs and canvas */
+    padding: 20px;
+}
+
+.graph-panel {
+    background-color: #2a2a4a;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    padding: 15px;
+    text-align: center;
+    margin-bottom: 20px; /* Space between graph and controls */
+}
+
+.graph-panel h2 {
+    color: #00bbf9;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.5em; /* Larger graph heading */
+}
+
+.graph-panel canvas {
+    background-color: #0f0f1a;
+    border: 1px solid #00bbf9;
+}

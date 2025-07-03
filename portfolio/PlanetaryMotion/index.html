@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Planetary Motion</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html#LI" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+    <h1>2D Planetary Motion Simulation</h1>
+    <div class="container">
+        <div class="graphs-container">
+            <div class="graph-panel">
+                <h2>Kinetic and Potential Energy (K & U vs. t)</h2>
+                <canvas id="energyGraphCanvas" width="400" height="300"></canvas>
+            </div>
+        </div>
+        <canvas id="simulationCanvas" width="1300" height="1000"></canvas>
+        <div class="controls">
+            <div class="slider-group">
+                <label for="starMass">Star Mass (x10^24 kg):</label>
+                <input type="range" id="starMass" min="1" max="2000000" value="1989000" step="1">
+                <span id="starMassValue">1989000</span>
+            </div>
+            <div class="slider-group">
+                <label for="planetMass">Planet Mass (x10^24 kg):</label>
+                <input type="range" id="planetMass" min="0.1" max="100" value="5.972" step="0.001">
+                <span id="planetMassValue">5.972</span>
+            </div>
+            <div class="slider-group">
+                <label for="orbitRadius">Initial Orbit Radius (x10^6 km):</label>
+                <input type="range" id="orbitRadius" min="1" max="500" value="149.6" step="1">
+                <span id="orbitRadiusValue">149.6</span>
+            </div>
+            <div class="slider-group">
+                <label for="initialVelocityMagnitude">Initial Velocity Magnitude (km/s):</label>
+                <input type="range" id="initialVelocityMagnitude" min="0" max="100" value="29.78" step="0.1">
+                <span id="initialVelocityMagnitudeValue">29.78</span>
+            </div>
+            <div class="slider-group">
+                <label for="initialVelocityAngle">Initial Velocity Angle (degrees):</label>
+                <input type="range" id="initialVelocityAngle" min="0" max="360" value="90" step="1">
+                <span id="initialVelocityAngleValue">90</span>
+            </div>
+            <div class="energy-display">
+                <h3>Energy:</h3>
+                <p>Kinetic Energy: <span id="kineticEnergy">0</span> J</p>
+                <p>Potential Energy: <span id="potentialEnergy">0</span> J</p>
+                <p>Total Energy: <span id="totalEnergy">0</span> J</p>
+            </div>
+            <button id="resetButton">Reset Simulation</button>
+            <button id="pauseButton">Pause Simulation</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Double Star System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html#LI" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+    <canvas id="starCanvas"></canvas>
+    <div class="container">
+        <div class="controls-panel">
+            <h2>Controls</h2>
+            <div class="control-group">
+                <label for="mass1" id="mass1-label">Star 1 Mass: <span>200</span></label>
+                <input type="range" id="mass1" min="10" max="200" value="20">
+            </div>
+            <div class="control-group">
+                <label for="mass2" id="mass2-label">Star 2 Mass: <span>100</span></label>
+                <input type="range" id="mass2" min="10" max="200" value="100">
+            </div>
+            <div class="control-group">
+                <label for="distance" id="distance-label">Distance Between Stars: <span>300</span></label>
+                <input type="range" id="distance" min="50" max="800" value="300">
+            </div>
+        </div>
+
+        <div class="properties-panel">
+            <h2>Star Properties</h2>
+            <div class="star-properties">
+                <h3>Star 1</h3>
+                <p>Mass: <span id="mass1-value">20</span></p>
+                <p>Orbit Radius (r1): <span id="r1-value"></span></p>
+                <p>Velocity: <span id="v1-value"></span></p>
+                <p>Kinetic Energy: <span id="ke1-value"></span></p>
+                <p>Potential Energy: <span id="pe1-value"></span></p>
+            </div>
+            <div class="star-properties">
+                <h3>Star 2</h3>
+                <p>Mass: <span id="mass2-value">10</span></p>
+                <p>Orbit Radius (r2): <span id="r2-value"></span></p>
+                <p>Velocity: <span id="v2-value"></span></p>
+                <p>Kinetic Energy: <span id="ke2-value"></span></p>
+                <p>Potential Energy: <span id="pe2-value"></span></p>
+            </div>
+            <div class="center-of-mass-info">
+                <h3>System Properties</h3>
+                <p>Distance Between Stars: <span id="distance-value">150</span></p>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
