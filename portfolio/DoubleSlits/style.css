@@ -6,6 +6,31 @@ body {
     color: #333;
 }
 
+.back-button {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    font-size: 20px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+.arrow {
+    margin-right: 5px;
+    font-size: 20px;
+}
+
 h1 {
     text-align: center;
     color: #1a237e;
