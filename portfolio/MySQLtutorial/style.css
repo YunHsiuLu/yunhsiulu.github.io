@@ -1,48 +1,49 @@
-body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    margin: 0;
-    background-color: #f4f4f4;
+.header {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  right: 20px; /* 讓寬度撐滿左右間距 */
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: white;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.1);
 }
 
 .back-button {
-    display: flex;
-    align-items: center;
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    padding: 10px 15px;
-    font-size: 20px;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-decoration: none;
-}
-.back-button:hover {
-    background-color: #0056b3;
-}
-.arrow {
-    margin-right: 5px;
-    font-size: 20px;
+  flex-shrink: 0; /* 不自動縮小 */
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  font-size: 20px;
+  color: #fff;
+  background-color: #007bff;
+  border-radius: 5px;
+  text-decoration: none;
 }
 
-.controls {
-    margin-bottom: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.list {
+  flex-grow: 1; /* 擴展佔滿父容器剩餘寬度 */
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.controls label, .controls select, .controls input {
-    margin: 5px 0;
+.list li {
+  background: #f6f8fa;
+  font-size: 1.15em;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  padding: 16px 20px;
+  border: 1px solid #ebebeb;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  transition: box-shadow 0.15s;
 }
 
-#mirrorCanvas {
-    border: 1px solid #000;
+.list li:hover {
+  box-shadow: 0 5px 16px rgba(64,128,255,0.06);
 }
+
