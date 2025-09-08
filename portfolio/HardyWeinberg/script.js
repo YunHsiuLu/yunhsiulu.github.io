@@ -113,17 +113,31 @@ class Particle {
 function createParticles() {
   particles.length = 0;
   const numParticles = parseInt(numParticlesInput.value);
-  const tFrequency = parseFloat(frequencyInput.value);
+  // const tFrequency = parseFloat(frequencyInput.value); // This is no longer used for initial setup.
+
+  // Determine the number of red particles randomly
+  const numRed = Math.floor(Math.random() * (numParticles + 1));
+
+  const colors = [];
+  for (let i = 0; i < numParticles; ++i) {
+    colors.push(i < numRed ? "red" : "blue");
+  }
+
+  // Shuffle colors to randomize which particles are red or blue
+  for (let i = colors.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [colors[i], colors[j]] = [colors[j], colors[i]];
+  }
 
   for (let i = 0; i < numParticles; i++) {
     const radius = 5;
     let x, y, overlapping;
-    
+
     do {
       x = Math.random() * (canvas.width - 2 * radius) + radius;
       y = Math.random() * (canvas.height - 2 * radius) + radius;
       overlapping = false;
-      
+
       for (let j = 0; j < particles.length; j++) {
         const other = particles[j];
         const dx = x - other.x;
@@ -138,9 +152,20 @@ function createParticles() {
 
     const dx = (Math.random() - 0.5) * 4;
     const dy = (Math.random() - 0.5) * 4;
-    const gene1 = Math.random() < tFrequency ? "T" : "t";
-    const gene2 = Math.random() < tFrequency ? "T" : "t";
-    const color = (gene1 === "T" || gene2 === "T") ? "red" : "blue";
+    const color = colors[i];
+    let gene1, gene2;
+
+    if (color === "red") {
+      // Red particles are heterozygous (Tt) to start with.
+      // Collisions will produce other genotypes.
+      gene1 = "T";
+      gene2 = "t";
+    } else {
+      // Blue particles are homozygous recessive (tt).
+      gene1 = "t";
+      gene2 = "t";
+    }
+
     particles.push(new Particle(x, y, radius, color, dx, dy, gene1, gene2));
   }
 
