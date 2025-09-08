@@ -6,7 +6,6 @@ canvas.height = 300;
 
 const particles = [];
 const maxChartPoints = 30; // 限制圖表的資料點數量
-const updateInterval = 10; // 每次碰撞更新一次圖表資料
 const numParticlesInput = document.getElementById("numParticles");
 const numParticlesValue = document.getElementById("numParticlesValue");
 const frequencyInput = document.getElementById("frequency");
@@ -20,14 +19,14 @@ let collisionChart = new CanvasJS.Chart("chartContainer", {
   animationEnabled: true,
   theme: "light2",
   title: {
-    text: "分子碰撞次數 v.s. 紅色分子佔比",
+    text: "交配次數 v.s. 顯性個體比例",
   },
   axisX: {
-    title: "Collision Times",
+    title: "交配次數",
     interval: 10,
   },
   axisY: {
-    title: "Red Molecule Ratio",
+    title: "顯性個體比例",
     includeZero: true,
     maximum: 1,
   },
@@ -70,14 +69,10 @@ class Particle {
     // Check for collisions with walls
     if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
       this.dx = -this.dx;
-      collisionTimes++;
-      calculateRedRatio();
     }
 
     if (this.y - this.radius < 0 || this.y + this.radius > canvas.height) {
       this.dy = -this.dy;
-      collisionTimes++;
-      calculateRedRatio();
     }
 
     // Check for collisions with other particles
@@ -122,8 +117,25 @@ function createParticles() {
 
   for (let i = 0; i < numParticles; i++) {
     const radius = 5;
-    const x = Math.random() * (canvas.width - 2 * radius) + radius;
-    const y = Math.random() * (canvas.height - 2 * radius) + radius;
+    let x, y, overlapping;
+    
+    do {
+      x = Math.random() * (canvas.width - 2 * radius) + radius;
+      y = Math.random() * (canvas.height - 2 * radius) + radius;
+      overlapping = false;
+      
+      for (let j = 0; j < particles.length; j++) {
+        const other = particles[j];
+        const dx = x - other.x;
+        const dy = y - other.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < radius + other.radius) {
+          overlapping = true;
+          break;
+        }
+      }
+    } while (overlapping);
+
     const dx = (Math.random() - 0.5) * 4;
     const dy = (Math.random() - 0.5) * 4;
     const gene1 = Math.random() < tFrequency ? "T" : "t";
@@ -141,15 +153,13 @@ function createParticles() {
 // Calculate and update red molecule ratio
 function calculateRedRatio() {
   const redRatio = particles.filter((p) => p.color === "red").length / particles.length;
-  if (collisionTimes % updateInterval === 0) {
-    redRatioData.push({ x: collisionTimes, y: redRatio });
-    while (redRatioData.length > maxChartPoints) {
-      redRatioData.shift(); // 移除超出最大數量的資料點
-    }
-
-    collisionChart.options.data[0].dataPoints = redRatioData;
-    collisionChart.render();
+  redRatioData.push({ x: collisionTimes, y: redRatio });
+  while (redRatioData.length > maxChartPoints) {
+    redRatioData.shift(); // 移除超出最大數量的資料點
   }
+
+  collisionChart.options.data[0].dataPoints = redRatioData;
+  collisionChart.render();
 }
 
 // Animation loop
@@ -177,4 +187,3 @@ frequencyInput.addEventListener("input", () => {
 // Initialize
 createParticles();
 animate();
-
