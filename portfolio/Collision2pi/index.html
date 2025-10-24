@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>方塊碰撞模擬（計算 π）</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>方塊碰撞模擬（計算 π）</h1>
+    <div id="info">
+      <div>碰撞次數：<span id="collisions">0</span></div>
+      <div>π ≈ <span id="pi">0</span></div>
+    </div>
+  </header>
+
+  <main>
+    <canvas id="canvas" width="1100" height="360"></canvas>
+
+    <section id="controls">
+      <label>質量等級 N（mass ratio = 100^N，N ≤ 6）：
+        <input id="digits" type="number" min="0" max="6" value="3">
+      </label>
+
+      <label>速度倍率：
+        <input id="speed" type="range" min="0.1" max="10" step="0.1" value="1">
+        <span id="speedVal">1.0×</span>
+      </label>
+
+      <div class="buttons">
+        <button id="resetBtn">重置（Start）</button>
+        <button id="toggleBtn">暫停</button>
+        <button id="stepBtn">單步</button>
+      </div>
+
+      <div class="notes">
+        小方塊質量 = 1；大方塊質量 = 100^N；若 N 越大，碰撞次數會給出 π 的更多位數。
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <small>事件驅動的彈性一維碰撞模擬（避免穿牆 / 重疊）</small>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
