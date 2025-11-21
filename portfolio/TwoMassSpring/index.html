@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupled Spring-Mass System</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- 引入 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- 返回按鈕 (保留你的格式) -->
+    <a href="../index.html#COUPLED" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+
+    <h1>Coupled Spring-Mass System</h1>
+    
+    <!-- 模擬動畫主畫布 -->
+    <canvas id="simCanvas" width="800" height="300"></canvas>
+
+    <!-- 參數控制區 -->
+    <div class="controls-container">
+        <div class="control-group">
+            <h3>Mass (kg)</h3>
+            <label>M<sub>1</sub>: <span id="val-m1">10</span> <input type="range" id="m1" min="1" max="50" value="10" step="1"></label>
+            <label>M<sub>2</sub>: <span id="val-m2">10</span> <input type="range" id="m2" min="1" max="50" value="10" step="1"></label>
+        </div>
+        <div class="control-group">
+            <h3>Spring Constant (N/m)</h3>
+            <label>k<sub>1</sub>: <span id="val-k1">5</span> <input type="range" id="k1" min="1" max="50" value="5" step="0.5"></label>
+            <label>k<sub>2</sub>: <span id="val-k2">5</span> <input type="range" id="k2" min="1" max="50" value="5" step="0.5"></label>
+            <label>k<sub>3</sub>: <span id="val-k3">5</span> <input type="range" id="k3" min="1" max="50" value="5" step="0.5"></label>
+        </div>
+        <div class="control-group" style="justify-content: center;">
+            <button id="btn-reset">Restart Simulation</button>
+        </div>
+    </div>
+
+    <!-- 圖表區 (動能 + FFT) -->
+    <div class="charts-wrapper">
+        <div class="chart-box">
+            <h4>Kinetic Energy (J)</h4>
+            <canvas id="chartKE"></canvas>
+        </div>
+        <div class="chart-box">
+            <h4>Frequency Domain (FFT)</h4>
+            <canvas id="chartFFT"></canvas>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
