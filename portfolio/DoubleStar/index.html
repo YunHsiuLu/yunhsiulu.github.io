@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Double Star System</title>
+    <title>Interactive Binary Star System (Time Control)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,40 +15,44 @@
         <div class="controls-panel">
             <h2>Controls</h2>
             <div class="control-group">
-                <label for="mass1" id="mass1-label">Star 1 Mass: <span>200</span></label>
-                <input type="range" id="mass1" min="10" max="200" value="20">
+                <label>Star 1 Mass: <span id="mass1-display">200</span></label>
+                <input type="range" id="mass1" min="10" max="300" value="200">
             </div>
             <div class="control-group">
-                <label for="mass2" id="mass2-label">Star 2 Mass: <span>100</span></label>
-                <input type="range" id="mass2" min="10" max="200" value="100">
+                <label>Star 2 Mass: <span id="mass2-display">100</span></label>
+                <input type="range" id="mass2" min="10" max="300" value="100">
             </div>
             <div class="control-group">
-                <label for="distance" id="distance-label">Distance Between Stars: <span>300</span></label>
-                <input type="range" id="distance" min="50" max="800" value="300">
+                <label>Initial Separation: <span id="distance-display">300</span></label>
+                <input type="range" id="distance" min="100" max="600" value="300">
             </div>
+            <div class="control-group">
+                <label>Velocity Factor: <span id="velocity-display">1.00</span> x</label>
+                <input type="range" id="velocity-scale" min="0.3" max="1.5" step="0.05" value="1.0">
+            </div>
+            <!-- 新增速度控制滑桿 -->
+            <div class="control-group" style="border-top: 1px dashed #ccc; padding-top: 10px; margin-top: 10px;">
+                <label>Sim Speed: <span id="speed-display">1.0</span> x</label>
+                <input type="range" id="sim-speed" min="0" max="3.0" step="0.1" value="1.0">
+            </div>
+
+            <button id="btn-reset">Reset System</button>
         </div>
 
         <div class="properties-panel">
-            <h2>Star Properties</h2>
-            <div class="star-properties">
-                <h3>Star 1</h3>
-                <p>Mass: <span id="mass1-value">20</span></p>
-                <p>Orbit Radius (r1): <span id="r1-value"></span></p>
-                <p>Velocity: <span id="v1-value"></span></p>
-                <p>Kinetic Energy: <span id="ke1-value"></span></p>
-                <p>Potential Energy: <span id="pe1-value"></span></p>
+            <h2>Telemetry</h2>
+            <div class="star-properties" style="border-left: 4px solid #ff8c00; padding-left: 10px;">
+                <h3>Star 1 (Orange)</h3>
+                <p>Velocity: <span id="v1-value">0</span></p>
+                <p>Kinetic E.: <span id="ke1-value">0</span></p>
             </div>
-            <div class="star-properties">
-                <h3>Star 2</h3>
-                <p>Mass: <span id="mass2-value">10</span></p>
-                <p>Orbit Radius (r2): <span id="r2-value"></span></p>
-                <p>Velocity: <span id="v2-value"></span></p>
-                <p>Kinetic Energy: <span id="ke2-value"></span></p>
-                <p>Potential Energy: <span id="pe2-value"></span></p>
+            <div class="star-properties" style="border-left: 4px solid #4682b4; padding-left: 10px; margin-top: 10px;">
+                <h3>Star 2 (Blue)</h3>
+                <p>Velocity: <span id="v2-value">0</span></p>
+                <p>Kinetic E.: <span id="ke2-value">0</span></p>
             </div>
-            <div class="center-of-mass-info">
-                <h3>System Properties</h3>
-                <p>Distance Between Stars: <span id="distance-value">150</span></p>
+            <div class="center-of-mass-info" style="margin-top: 15px; border-top: 1px solid #ddd; padding-top: 10px;">
+                <p>Distance: <span id="curr-dist-value">0</span></p>
             </div>
         </div>
     </div>

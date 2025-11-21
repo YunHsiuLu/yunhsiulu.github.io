@@ -1,9 +1,9 @@
 body {
     margin: 0;
     overflow: hidden;
-    background-color: #fff;
-    font-family: Arial, sans-serif;
-    font-size: 16px; /* Base font size */
+    background-color: #1a1a1a;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #333;
 }
 
 .back-button {
@@ -20,80 +20,65 @@ body {
     border-radius: 5px;
     cursor: pointer;
     text-decoration: none;
+    z-index: 1000;
 }
+.back-button:hover { background-color: #0056b3; }
+.arrow { margin-right: 5px; }
 
-.back-button:hover {
-    background-color: #0056b3;
-}
-
-.arrow {
-    margin-right: 5px;
-    font-size: 20px;
-}
-
-canvas {
-    display: block;
-}
+canvas { display: block; }
 
 .container {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 20px;
+    right: 20px;
     display: flex;
-    flex-direction: column; /* Arrange panels vertically */
-    gap: 20px;
+    flex-direction: column;
+    gap: 15px;
+    width: 300px;
+    pointer-events: none;
 }
 
-.controls-panel,
-.properties-panel {
-    background-color: rgba(255, 255, 255, 0.8);
+.controls-panel, .properties-panel {
+    background-color: rgba(255, 255, 255, 0.9);
     padding: 15px;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    pointer-events: auto;
 }
 
-.controls-panel h2,
-.properties-panel h2 {
+h2 {
     margin-top: 0;
-    color: #333;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 15px;
-    font-size: 1.4em; /* Larger heading */
+    font-size: 1.2em;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 8px;
+    margin-bottom: 12px;
 }
 
-.control-group {
-    margin-bottom: 10px;
-}
+h3 { margin: 5px 0; font-size: 1em; color: #555; }
 
+.control-group { margin-bottom: 12px; }
 .control-group label {
-    display: block;
-    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9em;
     font-weight: bold;
-    color: #555;
-    font-size: 1.1em; /* Larger label */
+    margin-bottom: 4px;
 }
 
-input[type="range"] {
-    width: 350px; /* Make sliders much longer for easier interaction */
-}
+input[type="range"] { width: 100%; cursor: pointer; }
 
-.star-properties h3 {
-    margin-top: 15px;
-    margin-bottom: 5px;
-    color: #444;
-    font-size: 1.2em; /* Larger star heading */
-}
+p { margin: 4px 0; font-size: 0.9em; color: #666; display: flex; justify-content: space-between;}
+span { font-weight: bold; color: #222; font-family: monospace;}
 
-.star-properties p,
-.center-of-mass-info p {
-    margin: 3px 0;
-    font-size: 1em; /* Standard paragraph size */
-    color: #666;
-}
-
-.star-properties span,
-.center-of-mass-info span {
+button#btn-reset {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
     font-weight: bold;
-    color: #333;
+    margin-top: 5px;
 }
+button#btn-reset:hover { background-color: #218838; }

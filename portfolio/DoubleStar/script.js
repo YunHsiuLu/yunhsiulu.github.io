@@ -1,195 +1,243 @@
 const canvas = document.getElementById('starCanvas');
 const ctx = canvas.getContext('2d');
 
-// Sliders
-const mass1Slider = document.getElementById('mass1');
-const mass2Slider = document.getElementById('mass2');
-const distanceSlider = document.getElementById('distance');
+// --- UI Elements ---
+const inputs = {
+    mass1: document.getElementById('mass1'),
+    mass2: document.getElementById('mass2'),
+    dist: document.getElementById('distance'),
+    vScale: document.getElementById('velocity-scale'),
+    speed: document.getElementById('sim-speed') // 新增速度輸入
+};
 
-// Slider Labels (for displaying values next to title)
-const mass1Label = document.getElementById('mass1-label');
-const mass2Label = document.getElementById('mass2-label');
-const distanceLabel = document.getElementById('distance-label');
+const displays = {
+    mass1: document.getElementById('mass1-display'),
+    mass2: document.getElementById('mass2-display'),
+    dist: document.getElementById('distance-display'),
+    vScale: document.getElementById('velocity-display'),
+    speed: document.getElementById('speed-display') // 新增速度顯示
+};
 
-// Output Values (in properties panel)
-const mass1Value = document.getElementById('mass1-value');
-const mass2Value = document.getElementById('mass2-value');
-const distanceValue = document.getElementById('distance-value'); // This is for the system properties panel
-const r1Value = document.getElementById('r1-value');
-const r2Value = document.getElementById('r2-value');
-const v1Value = document.getElementById('v1-value');
-const v2Value = document.getElementById('v2-value');
-const ke1Value = document.getElementById('ke1-value');
-const ke2Value = document.getElementById('ke2-value');
-const pe1Value = document.getElementById('pe1-value');
-const pe2Value = document.getElementById('pe2-value');
+const telemetry = {
+    v1: document.getElementById('v1-value'),
+    ke1: document.getElementById('ke1-value'),
+    v2: document.getElementById('v2-value'),
+    ke2: document.getElementById('ke2-value'),
+    currDist: document.getElementById('curr-dist-value'),
+};
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-// --- Configuration ---
-const G = 0.5;
-const star1 = { mass: 20, radius: 20, color: '#ff8c00' };
-const star2 = { mass: 10, radius: 10, color: '#4682b4' };
-let distanceBetweenStars = distanceSlider.value;
+// --- Simulation State ---
+const G = 0.8; 
+let star1 = { x: 0, y: 0, vx: 0, vy: 0, mass: 200, color: '#ff8c00', radius: 20, trail: [] };
+let star2 = { x: 0, y: 0, vx: 0, vy: 0, mass: 100, color: '#4682b4', radius: 15, trail: [] };
 let centerOfMass = { x: 0, y: 0 };
 
-const orbitPath1 = [];
-const orbitPath2 = [];
-let animationFrame = 0;
+const MAX_TRAIL_LENGTH = 200;
 
-// --- Physics Simulation Step (for pre-calculation) ---
-function updatePhysics(s1, s2) {
-    const dx = s2.x - s1.x;
-    const dy = s2.y - s1.y;
-    const distSq = dx * dx + dy * dy;
-    const dist = Math.sqrt(distSq);
+// --- Resize Handling ---
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    centerOfMass.x = canvas.width / 2;
+    centerOfMass.y = canvas.height / 2;
+}
+window.addEventListener('resize', resize);
+resize();
 
-    if (dist < s1.radius + s2.radius) return;
+// --- Initialization ---
+function initSystem() {
+    const m1 = parseInt(inputs.mass1.value);
+    const m2 = parseInt(inputs.mass2.value);
+    const initialDist = parseInt(inputs.dist.value);
+    const vFactor = parseFloat(inputs.vScale.value);
 
-    const force = (G * s1.mass * s2.mass) / distSq;
-    const forceX = (force * dx) / dist;
-    const forceY = (force * dy) / dist;
+    // Update Text
+    displays.mass1.textContent = m1;
+    displays.mass2.textContent = m2;
+    displays.dist.textContent = initialDist;
+    displays.vScale.textContent = vFactor.toFixed(2);
 
-    s1.vx += forceX / s1.mass;
-    s1.vy += forceY / s1.mass;
-    s2.vx -= forceX / s2.mass;
-    s2.vy -= forceY / s2.mass;
+    // Setup Stars
+    star1.mass = m1;
+    star1.radius = 10 + Math.sqrt(m1); 
+    star2.mass = m2;
+    star2.radius = 10 + Math.sqrt(m2);
 
-    s1.x += s1.vx;
-    s1.y += s1.vy;
-    s2.x += s2.vx;
-    s2.y += s2.vy;
+    // Position relative to Center of Mass
+    const totalMass = m1 + m2;
+    const r1 = (initialDist * m2) / totalMass;
+    const r2 = (initialDist * m1) / totalMass;
+
+    star1.x = centerOfMass.x - r1;
+    star1.y = centerOfMass.y;
+    star2.x = centerOfMass.x + r2;
+    star2.y = centerOfMass.y;
+
+    star1.trail = [];
+    star2.trail = [];
+
+    // Initial Velocity Calculation
+    const force = (G * m1 * m2) / (initialDist * initialDist);
+    const v1_circ = Math.sqrt( (force * r1) / m1 );
+    const v2_circ = Math.sqrt( (force * r2) / m2 );
+
+    star1.vx = 0;
+    star1.vy = v1_circ * vFactor; 
+
+    star2.vx = 0;
+    star2.vy = -v2_circ * vFactor; 
 }
 
-// --- (Re)set and Pre-calculate Orbits ---
-function resetAndCalculateOrbits() {
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const r = distanceBetweenStars;
+// --- Physics Engine ---
+function updatePhysics() {
+    // 取得當前模擬速度 (dt)
+    let dt = parseFloat(inputs.speed.value);
+    displays.speed.textContent = dt.toFixed(1);
 
-    const totalMass = star1.mass + star2.mass;
-    centerOfMass = { x: centerX, y: centerY };
+    // 如果速度為 0，則暫停物理計算，直接返回
+    if (dt <= 0) return;
 
-    const r1 = (r * star2.mass) / totalMass;
-    const r2 = (r * star1.mass) / totalMass;
+    const dx = star2.x - star1.x;
+    const dy = star2.y - star1.y;
+    const distSq = dx*dx + dy*dy;
+    const dist = Math.sqrt(distSq);
 
-    // Update display for individual orbital radii
-    r1Value.textContent = r1.toFixed(2);
-    r2Value.textContent = r2.toFixed(2);
+    if (dist < (star1.radius + star2.radius)) return; 
 
-    let tempStar1 = { ...star1, x: centerX - r1, y: centerY, vx: 0, vy: 0 };
-    let tempStar2 = { ...star2, x: centerX + r2, y: centerY, vx: 0, vy: 0 };
+    const force = (G * star1.mass * star2.mass) / distSq;
+    const fx = force * (dx / dist);
+    const fy = force * (dy / dist);
 
-    const v1 = Math.sqrt((G * star2.mass * star2.mass) / (totalMass * r));
-    const v2 = Math.sqrt((G * star1.mass * star1.mass) / (totalMass * r));
+    // 更新速度 (v = v0 + a * dt)
+    // 這裡我們將 dt 乘進去，實現時間快慢控制
+    star1.vx += (fx / star1.mass) * dt;
+    star1.vy += (fy / star1.mass) * dt;
+    
+    star2.vx -= (fx / star2.mass) * dt;
+    star2.vy -= (fy / star2.mass) * dt;
 
-    tempStar1.vy = -v1;
-    tempStar2.vy = v2;
+    // 更新位置 (x = x0 + v * dt)
+    star1.x += star1.vx * dt;
+    star1.y += star1.vy * dt;
+    
+    star2.x += star2.vx * dt;
+    star2.y += star2.vy * dt;
 
-    orbitPath1.length = 0;
-    orbitPath2.length = 0;
-
-    const orbitalPeriod = Math.ceil(2 * Math.PI * Math.sqrt(Math.pow(r, 3) / (G * totalMass)));
-
-    for (let i = 0; i < orbitalPeriod; i++) {
-        updatePhysics(tempStar1, tempStar2);
-        orbitPath1.push({ x: tempStar1.x, y: tempStar1.y, vx: tempStar1.vx, vy: tempStar1.vy });
-        orbitPath2.push({ x: tempStar2.x, y: tempStar2.y, vx: tempStar2.vx, vy: tempStar2.vy });
+    // 軌跡更新邏輯 (依據速度決定採樣頻率，避免慢動作時點太密集)
+    // 如果速度很快(dt大)，每一幀都紀錄；如果速度慢，則減少紀錄頻率
+    let recordFrequency = dt > 0.5 ? 1 : 3;
+    if (simulationFrame % recordFrequency === 0) {
+        star1.trail.push({x: star1.x, y: star1.y});
+        star2.trail.push({x: star2.x, y: star2.y});
+        
+        if (star1.trail.length > MAX_TRAIL_LENGTH) star1.trail.shift();
+        if (star2.trail.length > MAX_TRAIL_LENGTH) star2.trail.shift();
     }
-    animationFrame = 0;
+}
 
-    // Update initial slider values in properties panel
-    mass1Value.textContent = star1.mass;
-    mass2Value.textContent = star2.mass;
-    distanceValue.textContent = distanceBetweenStars;
+// --- Update UI Stats ---
+function updateTelemetry() {
+    // 計算顯示用的數值 (這裡顯示的是瞬時速度大小，與時間流逝速度無關)
+    const v1 = Math.hypot(star1.vx, star1.vy);
+    const v2 = Math.hypot(star2.vx, star2.vy);
+    const sep = Math.hypot(star2.x - star1.x, star2.y - star1.y);
+
+    const ke1 = 0.5 * star1.mass * v1 * v1;
+    const ke2 = 0.5 * star2.mass * v2 * v2;
+
+    telemetry.v1.textContent = v1.toFixed(2);
+    telemetry.ke1.textContent = Math.round(ke1);
+    telemetry.v2.textContent = v2.toFixed(2);
+    telemetry.ke2.textContent = Math.round(ke2);
+    telemetry.currDist.textContent = sep.toFixed(1);
 }
 
 // --- Drawing ---
 function draw() {
+    // 使用半透明黑色覆蓋，產生長殘影效果 (Motion Blur)
+    // 如果想要清晰的線條軌跡，可改回 clearRect
+    // ctx.fillStyle = 'rgba(26, 26, 26, 0.2)'; 
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 為了讓暫停時畫面乾淨，這裡使用 clearRect
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    drawOrbit(orbitPath1, 'rgba(255, 140, 0, 0.5)');
-    drawOrbit(orbitPath2, 'rgba(70, 130, 180, 0.5)');
-
+    // Draw Center of Mass
     ctx.beginPath();
-    ctx.arc(centerOfMass.x, centerOfMass.y, 5, 0, Math.PI * 2);
-    ctx.fillStyle = '#000';
+    ctx.arc(centerOfMass.x, centerOfMass.y, 4, 0, Math.PI*2);
+    ctx.fillStyle = '#666';
     ctx.fill();
+    ctx.fillStyle = '#888';
+    ctx.fillText("COM", centerOfMass.x + 8, centerOfMass.y + 4);
 
-    const pos1 = orbitPath1[animationFrame];
-    const pos2 = orbitPath2[animationFrame];
+    // Draw Trails
+    drawTrail(star1.trail, star1.color);
+    drawTrail(star2.trail, star2.color);
 
-    if (pos1) {
-        drawStar(star1, pos1.x, pos1.y);
-        const v1 = Math.sqrt(pos1.vx * pos1.vx + pos1.vy * pos1.vy);
-        const ke1 = 0.5 * star1.mass * v1 * v1;
-        const pe = -G * star1.mass * star2.mass / distanceBetweenStars; // System PE
-
-        v1Value.textContent = v1.toFixed(2);
-        ke1Value.textContent = ke1.toFixed(2);
-        pe1Value.textContent = pe.toFixed(2);
-    }
-    if (pos2) {
-        drawStar(star2, pos2.x, pos2.y);
-        const v2 = Math.sqrt(pos2.vx * pos2.vx + pos2.vy * pos2.vy);
-        const ke2 = 0.5 * star2.mass * v2 * v2;
-        const pe = -G * star1.mass * star2.mass / distanceBetweenStars; // System PE
-
-        v2Value.textContent = v2.toFixed(2);
-        ke2Value.textContent = ke2.toFixed(2);
-        pe2Value.textContent = pe.toFixed(2);
-    }
+    // Draw Stars
+    drawStar(star1);
+    drawStar(star2);
 }
 
-function drawStar(star, x, y) {
+function drawStar(star) {
     ctx.beginPath();
-    ctx.arc(x, y, star.radius, 0, Math.PI * 2);
+    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+    
+    const gradient = ctx.createRadialGradient(star.x, star.y, star.radius * 0.2, star.x, star.y, star.radius * 2);
+    gradient.addColorStop(0, star.color);
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    
+    ctx.fillStyle = gradient;
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter'; // 讓兩星重疊時變更亮
     ctx.fillStyle = star.color;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = star.color;
     ctx.fill();
+    ctx.restore();
 }
 
-function drawOrbit(path, color) {
+function drawTrail(trail, color) {
+    if (trail.length < 2) return;
     ctx.beginPath();
-    if (path.length < 2) return;
-    ctx.moveTo(path[0].x, path[0].y);
-    for (let i = 1; i < path.length; i++) {
-        ctx.lineTo(path[i].x, path[i].y);
-    }
-    ctx.closePath();
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
+    ctx.moveTo(trail[0].x, trail[0].y);
+    for (let i = 1; i < trail.length; i++) {
+        ctx.lineTo(trail[i].x, trail[i].y);
+    }
     ctx.stroke();
 }
 
-// --- Event Listeners ---
-mass1Slider.addEventListener('input', (e) => {
-    star1.mass = parseInt(e.target.value, 10);
-    mass1Label.querySelector('span').textContent = e.target.value;
-    resetAndCalculateOrbits();
-});
-
-mass2Slider.addEventListener('input', (e) => {
-    star2.mass = parseInt(e.target.value, 10);
-    mass2Label.querySelector('span').textContent = e.target.value;
-    resetAndCalculateOrbits();
-});
-
-distanceSlider.addEventListener('input', (e) => {
-    distanceBetweenStars = parseInt(e.target.value, 10);
-    distanceLabel.querySelector('span').textContent = e.target.value;
-    resetAndCalculateOrbits();
-});
-
 // --- Main Loop ---
-function animate() {
-    if (orbitPath1.length > 0) {
-        animationFrame = (animationFrame + 4) % orbitPath1.length;
-    }
+let simulationFrame = 0;
+function loop() {
+    updatePhysics();
+    updateTelemetry();
     draw();
-    requestAnimationFrame(animate);
+    simulationFrame++;
+    requestAnimationFrame(loop);
 }
 
-// --- Start ---
-resetAndCalculateOrbits();
-animate();
+// --- Events ---
+inputs.mass1.addEventListener('input', initSystem);
+inputs.mass2.addEventListener('input', initSystem);
+inputs.dist.addEventListener('input', initSystem);
+inputs.vScale.addEventListener('input', initSystem);
+
+// 速度滑桿不需要重新初始化系統，只需要在 updatePhysics 裡讀取即可
+// 但為了更新顯示數值，可以加個事件
+inputs.speed.addEventListener('input', () => {
+    displays.speed.textContent = parseFloat(inputs.speed.value).toFixed(1);
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+    // 重置時將速度設回 1.0
+    inputs.speed.value = 1.0;
+    displays.speed.textContent = "1.0";
+    initSystem();
+});
+
+// Start
+initSystem();
+loop();
