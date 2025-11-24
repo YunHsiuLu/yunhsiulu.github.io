@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ideal Gas Law Simulation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html#IG" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+
+    <div class="main-layout">
+        <!-- 左側：控制與數據區 -->
+        <div class="sidebar">
+            <h1>Ideal Gas Law</h1>
+            <p class="formula">PV = nRT</p>
+            <p class="sub-formula">v<sub>rms</sub> &propto; &radic;(T / M)</p>
+
+            <!-- 參數控制區 -->
+            <div class="controls-container">
+                <div class="control-group">
+                    <h3>Moles (n)</h3>
+                    <label>
+                        <input type="range" id="mol" min="0.2" max="2.0" value="1.0" step="0.1">
+                        <span id="val-mol">1.0</span> mol
+                    </label>
+                </div>
+                <div class="control-group">
+                    <h3>Volume (V)</h3>
+                    <label>
+                        <!-- 稍微調大最大值，讓向右擴張更有感 -->
+                        <input type="range" id="vol" min="100" max="800" value="300" step="10">
+                        <span id="val-vol">30.0</span> L
+                    </label>
+                </div>
+                <div class="control-group">
+                    <h3>Temperature (T)</h3>
+                    <label>
+                        <input type="range" id="temp" min="100" max="1000" value="300" step="10">
+                        <span id="val-temp">300</span> K
+                    </label>
+                </div>
+                <!-- 新增分子量控制 -->
+                <div class="control-group">
+                    <h3>Molar Mass (M)</h3>
+                    <label>
+                        <!-- 設定範圍 2 (H2) ~ 100 (重氣體) -->
+                        <input type="range" id="mass" min="2" max="100" value="28" step="2">
+                        <span id="val-mass">28</span> g/mol
+                    </label>
+                </div>
+            </div>
+
+            <!-- 結果顯示區 -->
+            <div class="results-container">
+                <div class="result-box">
+                    <h3>Pressure (P)</h3>
+                    <span id="res-pressure" class="big-number">0.00</span>
+                    <span class="unit">atm</span>
+                </div>
+                <div class="result-box">
+                    <h3>RMS Speed ($v_{rms}$)</h3>
+                    <span id="res-vrms" class="big-number">0.00</span>
+                    <span class="unit">m/s (Simulated)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側：模擬畫布 -->
+        <div class="simulation-area">
+            <canvas id="simCanvas"></canvas>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

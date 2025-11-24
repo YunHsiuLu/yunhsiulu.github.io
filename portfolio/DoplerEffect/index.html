@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doppler Effect Simulation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 返回按鈕 -->
+    <a href="../index.html#DE" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+
+    <h1>Doppler Effect Simulation</h1>
+    
+    <!-- 模擬顯示區域 -->
+    <div class="canvas-container">
+        <!-- 主模擬畫面 -->
+        <canvas id="simCanvas" width="800" height="300"></canvas>
+        <!-- 頻率變化圖表 -->
+        <canvas id="graphCanvas" width="800" height="150"></canvas>
+    </div>
+
+    <!-- 參數控制區 -->
+    <div class="controls-container">
+        
+        <!-- 聲源 (Source) 控制 -->
+        <div class="control-group source-group">
+            <h3>Sound Source (Emitter)</h3>
+            <label>
+                Velocity (v): <span id="val-v-src">0</span> m/s
+                <input type="range" id="slider-v-src" min="-340" max="340" value="0" step="10">
+            </label>
+            <label>
+                Accel (a):
+                <input type="number" id="input-a-src" value="0" step="1" class="num-input"> m/s²
+            </label>
+            <label>
+                Frequency: <span id="val-f-src">200</span> Hz
+                <input type="range" id="slider-f-src" min="100" max="400" value="200" step="10">
+            </label>
+        </div>
+
+        <!-- 觀察者 (Observer) 控制 -->
+        <div class="control-group observer-group">
+            <h3>Observer (Receiver)</h3>
+            <label>
+                Velocity (v): <span id="val-v-obs">0</span> m/s
+                <input type="range" id="slider-v-obs" min="-340" max="340" value="0" step="10">
+            </label>
+            <label>
+                Accel (a):
+                <input type="number" id="input-a-obs" value="0" step="1" class="num-input"> m/s²
+            </label>
+            <div class="info-display">
+                Observed Freq: <strong id="display-f-obs">200.0</strong> Hz
+            </div>
+        </div>
+
+        <!-- 全局控制 -->
+        <div class="control-group">
+            <h3>Simulation Control</h3>
+            <button id="btn-reset">Reset Positions</button>
+            <button id="btn-pause" class="secondary-btn">Pause / Play</button>
+            <div class="formula-display">
+                Speed of Sound: 343 m/s<br>
+                <span style="color:#d9534f">Red = Source</span>, <span style="color:#0275d8">Blue = Observer</span>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

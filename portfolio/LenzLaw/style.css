@@ -1,0 +1,132 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+h1 {
+    margin-top: 40px;
+    margin-bottom: 10px;
+    color: #2c3e50;
+}
+
+.instruction-text {
+    margin-bottom: 20px;
+    color: #666;
+    font-size: 1rem;
+    text-align: center;
+}
+
+/* 返回按鈕 */
+.back-button {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    font-size: 20px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    z-index: 1000;
+    transition: background-color 0.2s;
+}
+.back-button:hover {
+    background-color: #0056b3;
+}
+.arrow {
+    margin-right: 5px;
+}
+
+/* 畫布容器 */
+.canvas-container {
+    position: relative;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+canvas#simCanvas {
+    background-color: #fff;
+    cursor: grab; /* 預設游標 */
+    display: block;
+}
+
+canvas#simCanvas:active {
+    cursor: grabbing; /* 抓取時的游標 */
+}
+
+.overlay-hint {
+    position: absolute;
+    top: 40%;
+    left: 10%;
+    pointer-events: none; /* 讓滑鼠事件穿透 */
+    font-weight: bold;
+    color: rgba(0,0,0,0.3);
+    font-size: 2rem;
+    user-select: none;
+}
+
+/* 控制區 */
+.controls-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    width: 90%;
+    max-width: 800px;
+    justify-content: center;
+}
+
+.control-group {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.control-group h3 {
+    margin-top: 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 10px;
+    color: #555;
+    font-size: 1.1rem;
+}
+
+.control-group label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.status-display {
+    background: #f8f9fa;
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    border-left: 4px solid #007bff;
+}
+
+/* 圖表區 */
+.chart-wrapper {
+    flex: 2;
+    min-width: 300px;
+    height: 200px;
+}

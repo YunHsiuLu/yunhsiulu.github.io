@@ -1,214 +1,329 @@
-// Initialize Canvas
-const canvas = document.getElementById("simulationCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = 600;
-canvas.height = 300;
+const canvas = document.getElementById('simCanvas');
+const ctx = canvas.getContext('2d');
 
-const particles = [];
-const maxChartPoints = 30; // 限制圖表的資料點數量
-const numParticlesInput = document.getElementById("numParticles");
-const numParticlesValue = document.getElementById("numParticlesValue");
-const frequencyInput = document.getElementById("frequency");
-const frequencyValue = document.getElementById("frequencyValue");
+// --- 狀態變數 ---
+let bunnies = [];
+let generation = 0;
+let autoRunInterval = null;
 
-let collisionTimes = 0;
-let redRatioData = [];
+// 圖表歷史數據
+let historyLabels = [];
+let historyAA = [];
+let historyAa = [];
+let historyaa = [];
+let historyP = [];
+let historyQ = [];
 
-// Initialize CanvasJS chart
-let collisionChart = new CanvasJS.Chart("chartContainer", {
-  animationEnabled: true,
-  theme: "light2",
-  title: {
-    text: "交配次數 v.s. 顯性個體比例",
-  },
-  axisX: {
-    title: "交配次數",
-    interval: 10,
-  },
-  axisY: {
-    title: "顯性個體比例",
-    includeZero: true,
-    maximum: 1,
-  },
-  data: [
-    {
-      type: "line", // 使用折線圖
-      markerType: "none", // 移除數據點標記
-      dataPoints: [],
+// --- DOM 元素 ---
+const inputs = {
+    p: document.getElementById('init-p'),
+    popSize: document.getElementById('pop-size'),
+    fitAA: document.getElementById('fit-AA'),
+    fitAa: document.getElementById('fit-Aa'),
+    fitaa: document.getElementById('fit-aa')
+};
+
+const displays = {
+    p: document.getElementById('val-p'),
+    pop: document.getElementById('val-pop'),
+    fitAA: document.getElementById('val-fit-AA'),
+    fitAa: document.getElementById('val-fit-Aa'),
+    fitaa: document.getElementById('val-fit-aa'),
+    gen: document.getElementById('gen-count'),
+    popCount: document.getElementById('pop-count')
+};
+
+// --- 初始化 Chart.js ---
+const commonChartOptions = {
+    responsive: true,
+    animation: { duration: 500 },
+    scales: {
+        y: { beginAtZero: true, max: 1.0, ticks: { callback: v => (v * 100).toFixed(0) + '%' } }
     },
-  ],
-});
-
-collisionChart.render();
-
-// Particle class
-class Particle {
-  constructor(x, y, radius, color, dx, dy, gene1, gene2) {
-    this.x = x;
-    this.y = y;
-    this.radius = radius;
-    this.color = color;
-    this.dx = dx;
-    this.dy = dy;
-    this.gene1 = gene1;
-    this.gene2 = gene2;
-  }
-
-  draw() {
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
-    ctx.fillStyle = this.color;
-    ctx.fill();
-    ctx.closePath();
-  }
-
-  update() {
-    this.x += this.dx;
-    this.y += this.dy;
-
-    // Check for collisions with walls
-    if (this.x - this.radius < 0 || this.x + this.radius > canvas.width) {
-      this.dx = -this.dx;
-    }
-
-    if (this.y - this.radius < 0 || this.y + this.radius > canvas.height) {
-      this.dy = -this.dy;
-    }
-
-    // Check for collisions with other particles
-    for (let other of particles) {
-      if (this === other) continue;
-      console.log("before: ", this.color, other.color);
-      const dx = this.x - other.x;
-      const dy = this.y - other.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      if (distance < this.radius + other.radius) {
-        // Swap velocities
-        [this.dx, other.dx] = [other.dx, this.dx];
-        [this.dy, other.dy] = [other.dy, this.dy];
-
-        // Exchange genes
-        let new1_gene1 = (Math.random() < 0.5) ? this.gene1 : this.gene2;
-        let new1_gene2 = (Math.random() < 0.5) ? other.gene1 : other.gene2;
-        let new2_gene1 = (Math.random() < 0.5) ? this.gene1 : this.gene2;
-        let new2_gene2 = (Math.random() < 0.5) ? other.gene2 : other.gene2;
-
-        this.gene1 = new1_gene1;
-        this.gene2 = new2_gene1;
-        other.gene1 = new1_gene2;
-        other.gene2 = new2_gene2;
-        this.color = (this.gene1 === "T" || this.gene2 === "T") ? "red" : "blue";
-        other.color = (other.gene1 === "T" || other.gene2 === "T") ? "red" : "blue";
-        
-        console.log("after: ", this.color, other.color);
-        collisionTimes++;
-        calculateRedRatio();
-      }
-    }
-  }
-}
-
-// Create particles
-function createParticles() {
-  particles.length = 0;
-  const numParticles = parseInt(numParticlesInput.value);
-  // const tFrequency = parseFloat(frequencyInput.value); // This is no longer used for initial setup.
-
-  // Determine the number of red particles randomly
-  const numRed = Math.floor(Math.random() * (numParticles + 1));
-
-  const colors = [];
-  for (let i = 0; i < numParticles; ++i) {
-    colors.push(i < numRed ? "red" : "blue");
-  }
-
-  // Shuffle colors to randomize which particles are red or blue
-  for (let i = colors.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [colors[i], colors[j]] = [colors[j], colors[i]];
-  }
-
-  for (let i = 0; i < numParticles; i++) {
-    const radius = 5;
-    let x, y, overlapping;
-
-    do {
-      x = Math.random() * (canvas.width - 2 * radius) + radius;
-      y = Math.random() * (canvas.height - 2 * radius) + radius;
-      overlapping = false;
-
-      for (let j = 0; j < particles.length; j++) {
-        const other = particles[j];
-        const dx = x - other.x;
-        const dy = y - other.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        if (distance < radius + other.radius) {
-          overlapping = true;
-          break;
+    plugins: {
+        tooltip: {
+            callbacks: { label: (ctx) => ctx.dataset.label + ': ' + (ctx.raw * 100).toFixed(1) + '%' }
         }
-      }
-    } while (overlapping);
+    }
+};
 
-    const dx = (Math.random() - 0.5) * 4;
-    const dy = (Math.random() - 0.5) * 4;
-    const color = colors[i];
-    let gene1, gene2;
+const chartGeno = new Chart(document.getElementById('chartGeno'), {
+    type: 'line',
+    data: {
+        labels: historyLabels,
+        datasets: [
+            { label: 'AA (White)', borderColor: '#aaa', backgroundColor: '#eee', data: historyAA, fill: false, tension: 0.1 },
+            { label: 'Aa (Brown)', borderColor: '#D2691E', backgroundColor: '#D2691E', data: historyAa, fill: false, tension: 0.1 },
+            { label: 'aa (Black)', borderColor: '#333', backgroundColor: '#000', data: historyaa, fill: false, tension: 0.1 }
+        ]
+    },
+    options: commonChartOptions
+});
 
-    if (color === "red") {
-      // Red particles are heterozygous (Tt) to start with.
-      // Collisions will produce other genotypes.
-      gene1 = "T";
-      gene2 = "t";
-    } else {
-      // Blue particles are homozygous recessive (tt).
-      gene1 = "t";
-      gene2 = "t";
+const chartAllele = new Chart(document.getElementById('chartAllele'), {
+    type: 'line',
+    data: {
+        labels: historyLabels,
+        datasets: [
+            { label: 'Allele A (p)', borderColor: '#2980b9', data: historyP, tension: 0.1, borderWidth: 2 },
+            { label: 'Allele a (q)', borderColor: '#c0392b', data: historyQ, tension: 0.1, borderWidth: 2 }
+        ]
+    },
+    options: commonChartOptions
+});
+
+// --- 兔子類別 (視覺效果) ---
+class Bunny {
+    constructor(genotype) {
+        this.genotype = genotype; // 'AA', 'Aa', 'aa'
+        this.x = Math.random() * (canvas.width - 40) + 20;
+        this.y = Math.random() * (canvas.height * 0.5) + (canvas.height * 0.4); // 只在草地上
+        this.vx = (Math.random() - 0.5) * 2; // 隨機水平速度
+        this.hopPhase = Math.random() * Math.PI * 2; // 跳躍相位
     }
 
-    particles.push(new Particle(x, y, radius, color, dx, dy, gene1, gene2));
-  }
+    draw() {
+        // 根據基因型決定顏色
+        let color, earColor;
+        if (this.genotype === 'AA') {
+            color = '#FFFFFF'; earColor = '#FFC0CB'; // 白兔粉耳
+        } else if (this.genotype === 'Aa') {
+            color = '#D2691E'; earColor = '#8B4513'; // 棕兔深棕耳
+        } else {
+            color = '#333333'; earColor = '#555555'; // 黑兔灰耳
+        }
 
-  collisionTimes = 0;
-  redRatioData = [];
-  collisionChart.options.data[0].dataPoints = [];
-  collisionChart.render();
+        // 跳躍效果 (y 軸偏移)
+        const hopY = Math.abs(Math.sin(Date.now() / 200 + this.hopPhase)) * 15;
+        const drawY = this.y - hopY;
+
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#444';
+        ctx.lineWidth = 1;
+
+        // 身體
+        ctx.beginPath();
+        ctx.ellipse(this.x, drawY, 12, 10, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // 頭
+        ctx.beginPath();
+        ctx.arc(this.x, drawY - 10, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // 耳朵
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.ellipse(this.x - 4, drawY - 20, 3, 8, -0.2, 0, Math.PI * 2); // 左耳
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.ellipse(this.x + 4, drawY - 20, 3, 8, 0.2, 0, Math.PI * 2); // 右耳
+        ctx.fill();
+        ctx.stroke();
+
+        // 眼睛
+        ctx.fillStyle = 'black';
+        ctx.beginPath();
+        ctx.arc(this.x - 3, drawY - 12, 1, 0, Math.PI * 2);
+        ctx.arc(this.x + 3, drawY - 12, 1, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    update() {
+        this.x += this.vx;
+        // 邊界反彈
+        if (this.x < 20 || this.x > canvas.width - 20) this.vx *= -1;
+    }
 }
 
-// Calculate and update red molecule ratio
-function calculateRedRatio() {
-  const redRatio = particles.filter((p) => p.color === "red").length / particles.length;
-  redRatioData.push({ x: collisionTimes, y: redRatio });
-  while (redRatioData.length > maxChartPoints) {
-    redRatioData.shift(); // 移除超出最大數量的資料點
-  }
+// --- 模擬邏輯核心 ---
 
-  collisionChart.options.data[0].dataPoints = redRatioData;
-  collisionChart.render();
+function resetSimulation() {
+    generation = 0;
+    historyLabels.length = 0;
+    historyAA.length = 0;
+    historyAa.length = 0;
+    historyaa.length = 0;
+    historyP.length = 0;
+    historyQ.length = 0;
+    
+    createInitialGeneration();
+    updateCharts();
+    
+    if (autoRunInterval) {
+        clearInterval(autoRunInterval);
+        autoRunInterval = null;
+        document.getElementById('btn-auto').textContent = 'Auto Run';
+    }
 }
 
-// Animation loop
+function createInitialGeneration() {
+    const p = parseFloat(inputs.p.value);
+    const q = 1 - p;
+    const size = parseInt(inputs.popSize.value);
+    
+    bunnies = [];
+    
+    // 根據 Hardy-Weinberg 比例 p^2, 2pq, q^2 生成初始群體
+    for (let i = 0; i < size; i++) {
+        const rand = Math.random();
+        let genotype;
+        
+        if (rand < p * p) {
+            genotype = 'AA';
+        } else if (rand < p * p + 2 * p * q) {
+            genotype = 'Aa';
+        } else {
+            genotype = 'aa';
+        }
+        bunnies.push(new Bunny(genotype));
+    }
+    
+    recordStats();
+}
+
+function nextGeneration() {
+    const fitAA = parseFloat(inputs.fitAA.value);
+    const fitAa = parseFloat(inputs.fitAa.value);
+    const fitaa = parseFloat(inputs.fitaa.value);
+    const targetSize = parseInt(inputs.popSize.value);
+
+    // 1. 計算當前存活基因庫 (Gene Pool after Selection)
+    let genePoolA = 0;
+    let genePoola = 0;
+
+    bunnies.forEach(b => {
+        // 每個個體貢獻基因到下一代的機率取決於 Fitness
+        // 這裡我們用簡單的加權法：Fitness 就是該個體能貢獻基因的 "權重"
+        if (b.genotype === 'AA') {
+            genePoolA += 2 * fitAA;
+        } else if (b.genotype === 'Aa') {
+            genePoolA += 1 * fitAa;
+            genePoola += 1 * fitAa;
+        } else if (b.genotype === 'aa') {
+            genePoola += 2 * fitaa;
+        }
+    });
+
+    const totalAlleles = genePoolA + genePoola;
+
+    // 如果群體滅絕
+    if (totalAlleles === 0) {
+        alert("Population Extinct! Resetting...");
+        resetSimulation();
+        return;
+    }
+
+    // 2. 計算修正後的等位基因頻率 p (Selection 後的 p)
+    const newP = genePoolA / totalAlleles;
+    const newQ = 1 - newP;
+
+    // 3. 產生下一代 (Random Mating based on new p)
+    bunnies = [];
+    for (let i = 0; i < targetSize; i++) {
+        const rand = Math.random();
+        let genotype;
+        // 假設隨機交配: AA = p^2, Aa = 2pq, aa = q^2
+        if (rand < newP * newP) {
+            genotype = 'AA';
+        } else if (rand < newP * newP + 2 * newP * newQ) {
+            genotype = 'Aa';
+        } else {
+            genotype = 'aa';
+        }
+        bunnies.push(new Bunny(genotype));
+    }
+
+    generation++;
+    recordStats();
+    updateCharts();
+}
+
+function recordStats() {
+    let countAA = 0, countAa = 0, countaa = 0;
+    bunnies.forEach(b => {
+        if (b.genotype === 'AA') countAA++;
+        else if (b.genotype === 'Aa') countAa++;
+        else countaa++;
+    });
+
+    const total = bunnies.length;
+    // 計算實際頻率
+    const freqAA = countAA / total;
+    const freqAa = countAa / total;
+    const freqaa = countaa / total;
+
+    // 計算 p (A 的頻率)
+    const p = (2 * countAA + countAa) / (2 * total);
+    const q = 1 - p;
+
+    // 更新 UI
+    displays.gen.textContent = generation;
+    displays.popCount.textContent = total;
+
+    // 更新歷史數據 (只保留最近 20 代以免圖表太擠，或者一直保留)
+    historyLabels.push(generation);
+    historyAA.push(freqAA);
+    historyAa.push(freqAa);
+    historyaa.push(freqaa);
+    historyP.push(p);
+    historyQ.push(q);
+}
+
+function updateCharts() {
+    chartGeno.update();
+    chartAllele.update();
+}
+
+// --- 動畫循環 ---
 function animate() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  particles.forEach((particle) => {
-    particle.update();
-    particle.draw();
-  });
+    // 排序 y 軸讓前面的兔子蓋住後面的
+    bunnies.sort((a, b) => a.y - b.y);
 
-  requestAnimationFrame(animate);
+    bunnies.forEach(b => {
+        b.update();
+        b.draw();
+    });
+
+    requestAnimationFrame(animate);
 }
 
-// Event listeners
-numParticlesInput.addEventListener("input", () => {
-  numParticlesValue.textContent = numParticlesInput.value;
-  createParticles();
-});
-frequencyInput.addEventListener("input", () => {
-  frequencyValue.textContent = frequencyInput.value;
-  createParticles();
+// --- 事件監聽 ---
+Object.keys(inputs).forEach(key => {
+    inputs[key].addEventListener('input', (e) => {
+        displays[key].textContent = e.target.value;
+        // 如果是在第0代調整 p 或 size，實時重置
+        if ((key === 'p' || key === 'popSize') && generation === 0) {
+            resetSimulation();
+        }
+    });
 });
 
-// Initialize
-createParticles();
+document.getElementById('btn-next').addEventListener('click', nextGeneration);
+
+document.getElementById('btn-reset').addEventListener('click', resetSimulation);
+
+document.getElementById('btn-auto').addEventListener('click', () => {
+    const btn = document.getElementById('btn-auto');
+    if (autoRunInterval) {
+        clearInterval(autoRunInterval);
+        autoRunInterval = null;
+        btn.textContent = 'Auto Run';
+        btn.style.backgroundColor = '#f39c12';
+    } else {
+        nextGeneration(); // 馬上跑一代
+        autoRunInterval = setInterval(nextGeneration, 1500); // 每1.5秒一代
+        btn.textContent = 'Stop Auto';
+        btn.style.backgroundColor = '#7f8c8d';
+    }
+});
+
+// 啟動
+resetSimulation();
 animate();

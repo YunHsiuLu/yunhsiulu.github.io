@@ -7,44 +7,43 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header>
-    <h1>方塊碰撞模擬（計算 π）</h1>
-    <div id="info">
-      <div>碰撞次數：<span id="collisions">0</span></div>
-      <div>π ≈ <span id="pi">0</span></div>
-    </div>
-  </header>
-
-  <main>
-    <canvas id="canvas" width="1100" height="360"></canvas>
-
-    <section id="controls">
-      <label>質量等級 N（mass ratio = 100^N，N ≤ 6）：
-        <input id="digits" type="number" min="0" max="6" value="3">
-      </label>
-
-      <label>速度倍率：
-        <input id="speed" type="range" min="0.1" max="10" step="0.1" value="1">
-        <span id="speedVal">1.0×</span>
-      </label>
-
-      <div class="buttons">
-        <button id="resetBtn">重置（Start）</button>
-        <button id="toggleBtn">暫停</button>
-        <button id="stepBtn">單步</button>
+  <div class="container">
+    <header>
+      <h1>方塊碰撞模擬 (Calculating π)</h1>
+      <div class="stats">
+        <div class="stat-box">
+          <span class="label">碰撞次數</span>
+          <span class="value" id="collisions">0</span>
+        </div>
+        <div class="stat-box">
+          <span class="label">π 的估算值</span>
+          <span class="value" id="pi">0</span>
+        </div>
       </div>
+    </header>
 
-      <div class="notes">
-        小方塊質量 = 1；大方塊質量 = 100^N；若 N 越大，碰撞次數會給出 π 的更多位數。
+    <main>
+      <canvas id="canvas" width="800" height="300"></canvas>
+
+      <section id="controls">
+        <div class="control-group">
+          <label for="digits">位數精確度 (N)：</label>
+          <input id="digits" type="number" min="0" max="7" value="3">
+          <span class="hint">質量比 = 100<sup>N</sup></span>
+        </div>
+
+        <div class="buttons">
+          <button id="resetBtn" class="primary">重新開始</button>
+          <button id="toggleBtn">暫停</button>
+        </div>
+      </section>
+
+      <div class="description">
+        <p>當大方塊 (M = 100<sup>N</sup>) 撞擊小方塊 (m = 1) 時，總碰撞次數將會是 π 的前 N+1 位數。</p>
+        <p>程式會自動調整運算速度：N 越大，動畫中的碰撞處理速度越快。</p>
       </div>
-    </section>
-  </main>
-
-  <footer>
-    <small>事件驅動的彈性一維碰撞模擬（避免穿牆 / 重疊）</small>
-  </footer>
-
+    </main>
+  </div>
   <script src="script.js"></script>
 </body>
 </html>
-

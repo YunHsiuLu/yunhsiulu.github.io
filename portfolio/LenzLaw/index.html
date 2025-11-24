@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lenz's Law Simulation</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- 返回按鈕 -->
+    <a href="../index.html#LENZ" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+
+    <h1>Lenz's Law & Faraday's Induction</h1>
+
+    <div class="instruction-text">
+        Drag the magnet through the coil. Notice that current is only induced when the magnetic flux <strong>changes</strong>.
+    </div>
+
+    <!-- 畫布區域 -->
+    <div class="canvas-container">
+        <canvas id="simCanvas" width="800" height="350"></canvas>
+        <div class="overlay-hint">Drag Me! ➔</div>
+    </div>
+
+    <!-- 控制與數據區 -->
+    <div class="controls-container">
+        <div class="control-group">
+            <h3>Parameters</h3>
+            <label>
+                Coil Sensitivity (Turns): 
+                <input type="range" id="slider-turns" min="1" max="50" value="20">
+            </label>
+            <div class="status-display">
+                Current (I): <strong id="val-current">0.00</strong> A
+            </div>
+            <div class="status-display">
+                Flux ($\Phi$): <strong id="val-flux">0.00</strong> Wb
+            </div>
+        </div>
+
+        <div class="chart-wrapper">
+            <canvas id="chartCurrent"></canvas>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

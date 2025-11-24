@@ -3,32 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Particle Simulation</title>
+    <title>Hardy-Weinberg Simulation</title>
     <link rel="stylesheet" href="style.css">
+    <!-- 引入 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <a href="../index.html#LI" class="back-button">
+    <!-- 返回按鈕 -->
+    <a href="../index.html#HARDY" class="back-button">
         <span class="arrow">←</span>
     </a>
+
+    <h1>Hardy-Weinberg Equilibrium (兔子繁衍模擬)</h1>
+    
     <div class="main-container">
-        <div class="top-container">
-            <canvas id="simulationCanvas"></canvas>
-            <div id="chartContainer" style="height: 300px; width: 100%;"></div>
-        </div>
-        <div class="controls">
-            <div>
-                <label for="numParticles">族群數量: </label>
-                <input type="range" id="numParticles" min="5" max="200" value="20">
-                <span id="numParticlesValue">20</span>
+        <!-- 模擬動畫主畫布 -->
+        <div class="canvas-container">
+            <canvas id="simCanvas" width="800" height="350"></canvas>
+            <div class="overlay-info">
+                Generation: <span id="gen-count">0</span> | Population: <span id="pop-count">0</span>
             </div>
-            <div>
-                <label for="frequency">顯性基因T的頻率: </label>
-                <input type="range" id="frequency" min="0" max="1" step="0.01" value="0.5">
-                <span id="frequencyValue">0.5</span>
+        </div>
+
+        <!-- 參數控制區 -->
+        <div class="controls-container">
+            <!-- 初始設定 -->
+            <div class="control-group">
+                <h3>Initial Settings</h3>
+                <label>
+                    Initial Allele A (p): <span id="val-p">0.50</span>
+                    <input type="range" id="init-p" min="0.01" max="0.99" value="0.5" step="0.01">
+                </label>
+                <label>
+                    Population Size: <span id="val-pop">50</span>
+                    <input type="range" id="pop-size" min="10" max="100" value="50" step="5">
+                </label>
+            </div>
+
+            <!-- 天擇設定 (Fitness) -->
+            <div class="control-group">
+                <h3>Fitness (Survival Rate)</h3>
+                <label style="color: #555; font-size: 0.8rem; margin-bottom:5px;">1.0 = 100% 存活, 0.0 = 滅絕</label>
+                <label>
+                    <span class="dot aa"></span> AA (White): <span id="val-fit-AA">1.0</span>
+                    <input type="range" id="fit-AA" min="0" max="1" value="1" step="0.05">
+                </label>
+                <label>
+                    <span class="dot aa-het"></span> Aa (Brown): <span id="val-fit-Aa">1.0</span>
+                    <input type="range" id="fit-Aa" min="0" max="1" value="1" step="0.05">
+                </label>
+                <label>
+                    <span class="dot aa-rec"></span> aa (Black): <span id="val-fit-aa">1.0</span>
+                    <input type="range" id="fit-aa" min="0" max="1" value="1" step="0.05">
+                </label>
+            </div>
+
+            <!-- 操作按鈕 -->
+            <div class="control-group actions">
+                <button id="btn-next">Next Generation (+1)</button>
+                <button id="btn-auto" class="secondary">Auto Run</button>
+                <button id="btn-reset" class="danger">Reset Simulation</button>
+            </div>
+        </div>
+
+        <!-- 圖表區 -->
+        <div class="charts-wrapper">
+            <div class="chart-box">
+                <h4>Genotype Frequencies (AA, Aa, aa)</h4>
+                <canvas id="chartGeno"></canvas>
+            </div>
+            <div class="chart-box">
+                <h4>Allele Frequencies (p, q)</h4>
+                <canvas id="chartAllele"></canvas>
             </div>
         </div>
     </div>
-    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
     <script src="script.js"></script>
 </body>
 </html>
