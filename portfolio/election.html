@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>並立制 vs 聯立制：互動模擬教室</title>
+    <!-- 引入 Tailwind CSS 以快速美化 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+            background-color: #f3f4f6;
+        }
+        .seat-bar {
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        
+        <!-- Header -->
+        <div class="bg-blue-600 p-6 text-white text-center">
+            <h1 class="text-3xl font-bold mb-2">選舉制度大解密</h1>
+            <p class="text-blue-100">並立制 (Parallel) vs. 聯立制 (MMP)</p>
+        </div>
+
+        <!-- Part 1: Concept -->
+        <div class="p-6 border-b">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">📢 1. 一分鐘搞懂核心差異</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
+                    <h3 class="text-xl font-bold text-green-700 mb-2">並立制 (台灣現行)</h3>
+                    <p class="text-gray-600 mb-2"><strong>關鍵字：分開算</strong></p>
+                    <p class="text-sm text-gray-500">
+                        就像去速食店，漢堡（區域）和薯條（不分區）分開點。
+                        你漢堡買得多，不影響你薯條能買多少。兩張票互不干涉。
+                    </p>
+                    <div class="mt-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded inline-block">公式：總席次 = 區域贏的 + (政黨票比例 × 不分區總額)</div>
+                </div>
+                <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-purple-500">
+                    <h3 class="text-xl font-bold text-purple-700 mb-2">聯立制 (德國模式)</h3>
+                    <p class="text-gray-600 mb-2"><strong>關鍵字：總額補足</strong></p>
+                    <p class="text-sm text-gray-500">
+                        就像吃自助餐，政黨票決定你的「總食量」。
+                        如果你已經夾了很多肉（區域），剩下的青菜（不分區）就只能夾少一點，目的是湊滿那個總量。
+                    </p>
+                    <div class="mt-2 bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded inline-block">公式：總席次 ≈ 總座位 × 政黨票比例</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 2: Interactive Simulator -->
+        <div class="p-6 bg-blue-50">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">🎮 2. 互動模擬器</h2>
+            <p class="text-sm text-gray-600 mb-6">
+                假設國會總共有 <strong>100 席</strong>（50席區域 + 50席不分區）。<br>
+                試著調整下方的「政黨得票率」與「區域當選席次」，看看結果有何不同！
+            </p>
+
+            <!-- Controls -->
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <!-- Party A Controls -->
+                <div class="bg-white p-4 rounded shadow-sm">
+                    <h3 class="font-bold text-red-500 mb-3 text-lg">🔴 A 政黨 (大黨)</h3>
+                    
+                    <label class="block text-sm font-bold mb-1">政黨票得票率: <span id="val-vote-a">40</span>%</label>
+                    <input type="range" id="input-vote-a" min="0" max="100" value="40" class="w-full h-2 bg-red-200 rounded-lg appearance-none cursor-pointer mb-4">
+                    
+                    <label class="block text-sm font-bold mb-1">區域當選席次 (滿分50): <span id="val-district-a">35</span>席</label>
+                    <input type="range" id="input-district-a" min="0" max="50" value="35" class="w-full h-2 bg-red-200 rounded-lg appearance-none cursor-pointer">
+                    <p class="text-xs text-gray-400 mt-1">大黨通常在區域選舉有優勢</p>
+                </div>
+
+                <!-- Party B Controls -->
+                <div class="bg-white p-4 rounded shadow-sm">
+                    <h3 class="font-bold text-blue-500 mb-3 text-lg">🔵 B 政黨 (小黨)</h3>
+                    
+                    <!-- Auto calculated for simplicity in this demo -->
+                    <div class="mb-4">
+                        <p class="text-sm font-bold">政黨票得票率: <span id="val-vote-b">60</span>%</p>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                            <div id="bar-vote-b" class="bg-blue-500 h-2.5 rounded-full" style="width: 60%"></div>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">*註：為簡化計算，設 B 黨拿走 A 黨以外所有票</p>
+                    </div>
+
+                    <label class="block text-sm font-bold mb-1">區域當選席次 (滿分50): <span id="val-district-b">15</span>席</label>
+                    <input type="range" id="input-district-b" min="0" max="50" value="15" class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer">
+                    <p class="text-xs text-gray-400 mt-1">小黨區域難贏，主要靠政黨票</p>
+                </div>
+            </div>
+
+            <!-- Visualization Results -->
+            <div class="grid md:grid-cols-2 gap-8">
+                
+                <!-- Parallel Result -->
+                <div class="bg-white p-5 rounded-lg shadow border-t-4 border-green-500">
+                    <h3 class="text-xl font-bold text-center mb-4">並立制結果 (Parallel)</h3>
+                    <div class="space-y-4">
+                        <!-- Party A Result -->
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-bold text-red-600">A黨 總席次: <span id="res-para-total-a">0</span></span>
+                                <span class="text-gray-500 text-xs">(區域<span id="res-para-dist-a">0</span> + 不分區<span id="res-para-list-a">0</span>)</span>
+                            </div>
+                            <div class="flex h-6 w-full bg-gray-200 rounded overflow-hidden">
+                                <div id="vis-para-dist-a" class="bg-red-400 h-full flex items-center justify-center text-xs text-white" style="width:0%"></div>
+                                <div id="vis-para-list-a" class="bg-red-600 h-full flex items-center justify-center text-xs text-white" style="width:0%"></div>
+                            </div>
+                        </div>
+                        <!-- Party B Result -->
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-bold text-blue-600">B黨 總席次: <span id="res-para-total-b">0</span></span>
+                                <span class="text-gray-500 text-xs">(區域<span id="res-para-dist-b">0</span> + 不分區<span id="res-para-list-b">0</span>)</span>
+                            </div>
+                            <div class="flex h-6 w-full bg-gray-200 rounded overflow-hidden">
+                                <div id="vis-para-dist-b" class="bg-blue-400 h-full flex items-center justify-center text-xs text-white" style="width:0%"></div>
+                                <div id="vis-para-list-b" class="bg-blue-600 h-full flex items-center justify-center text-xs text-white" style="width:0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-sm text-gray-600 bg-gray-100 p-2 rounded">
+                        <strong>觀察：</strong> A黨雖然政黨票較少，但因為區域贏得多，總席次可能反而比B黨多！這對大黨非常有利。
+                    </p>
+                </div>
+
+                <!-- MMP Result -->
+                <div class="bg-white p-5 rounded-lg shadow border-t-4 border-purple-500">
+                    <h3 class="text-xl font-bold text-center mb-4">聯立制結果 (MMP)</h3>
+                    <div class="space-y-4">
+                        <!-- Party A Result -->
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-bold text-red-600">A黨 總席次: <span id="res-mmp-total-a">0</span></span>
+                                <span class="text-gray-500 text-xs">(應得<span id="res-mmp-target-a">0</span> - 已有區域<span id="res-mmp-dist-a">0</span>)</span>
+                            </div>
+                            <div class="flex h-6 w-full bg-gray-200 rounded overflow-hidden relative">
+                                <!-- Marker for Target -->
+                                <div id="mark-mmp-a" class="absolute top-0 bottom-0 border-r-2 border-black z-10" style="left:0%"></div>
+                                <div id="vis-mmp-dist-a" class="bg-red-400 h-full flex items-center justify-center text-xs text-white" style="width:0%"></div>
+                                <div id="vis-mmp-list-a" class="bg-red-600 h-full flex items-center justify-center text-xs text-white" style="width:0%"></div>
+                            </div>
+                            <div id="overhang-msg-a" class="hidden text-xs text-purple-600 font-bold mt-1">⚠️ 超額席次！區域贏太多了</div>
+                        </div>
+                        <!-- Party B Result -->
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="font-bold text-blue-600">B黨 總席次: <span id="res-mmp-total-b">0</span></span>
+                                <span class="text-gray-500 text-xs">(應得<span id="res-mmp-target-b">0</span> - 已有區域<span id="res-mmp-dist-b">0</span>)</span>
+                            </div>
+                            <div class="flex h-6 w-full bg-gray-200 rounded overflow-hidden relative">
+                                <div id="mark-mmp-b" class="absolute top-0 bottom-0 border-r-2 border-black z-10" style="left:0%"></div>
+                                <div id="vis-mmp-dist-b" class="bg-blue-400 h-full flex items-center justify-center text-xs text-white" style="width:0%"></div>
+                                <div id="vis-mmp-list-b" class="bg-blue-600 h-full flex items-center justify-center text-xs text-white" style="width:0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-sm text-gray-600 bg-gray-100 p-2 rounded">
+                        <strong>觀察：</strong> 席次分配高度吻合政黨得票率。A黨雖然區域贏很多，但不分區會分不到席次（甚至產生超額），以確保比例公平。
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Part 3: Comparison Table -->
+        <div class="p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">⚖️ 3. 優缺點大比拚</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                            <th class="py-3 px-6 text-left">特點</th>
+                            <th class="py-3 px-6 text-left text-green-700">並立制 (Parallel)</th>
+                            <th class="py-3 px-6 text-left text-purple-700">聯立制 (MMP)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-600 text-sm font-light">
+                        <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="py-3 px-6 text-left font-bold">核心精神</td>
+                            <td class="py-3 px-6 text-left">效率優先，容易形成兩黨制</td>
+                            <td class="py-3 px-6 text-left">公平優先，反映多元民意</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="py-3 px-6 text-left font-bold">計算方式</td>
+                            <td class="py-3 px-6 text-left">區域歸區域，政黨歸政黨，互不影響</td>
+                            <td class="py-3 px-6 text-left">政黨票決定總席次，區域先填，不夠再補</td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="py-3 px-6 text-left font-bold">優點</td>
+                            <td class="py-3 px-6 text-left">
+                                <ul class="list-disc pl-4">
+                                    <li>計算簡單，選民容易理解</li>
+                                    <li>政府通常較穩定（大黨易過半）</li>
+                                    <li>區域立委與選民連結強</li>
+                                </ul>
+                            </td>
+                            <td class="py-3 px-6 text-left">
+                                <ul class="list-disc pl-4">
+                                    <li>票票等值，小黨生存空間大</li>
+                                    <li>國會結構精準反映民意比例</li>
+                                    <li>減少「死票」感</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="py-3 px-6 text-left font-bold">缺點</td>
+                            <td class="py-3 px-6 text-left">
+                                <ul class="list-disc pl-4">
+                                    <li>票票不等值，小黨很難出頭</li>
+                                    <li>可能出現「得票少、席次多」的現象</li>
+                                </ul>
+                            </td>
+                            <td class="py-3 px-6 text-left">
+                                <ul class="list-disc pl-4">
+                                    <li>計算複雜（超額席次問題）</li>
+                                    <li>小黨林立可能導致聯合政府難產</li>
+                                    <li>極端政黨較容易進入國會</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-gray-100 p-4 text-center text-gray-500 text-xs">
+            Designed for educational purposes. Simplified calculation models used.
+        </div>
+
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // DOM Elements
+        const inputVoteA = document.getElementById('input-vote-a');
+        const inputDistA = document.getElementById('input-district-a');
+        const inputDistB = document.getElementById('input-district-b');
+
+        // Display Elements
+        const valVoteA = document.getElementById('val-vote-a');
+        const valVoteB = document.getElementById('val-vote-b');
+        const barVoteB = document.getElementById('bar-vote-b');
+        
+        const valDistA = document.getElementById('val-district-a');
+        const valDistB = document.getElementById('val-district-b');
+
+        // Constants for the simulation
+        const TOTAL_SEATS = 100;
+        const DISTRICT_SEATS = 50;
+        const LIST_SEATS = 50;
+
+        function updateSimulation() {
+            // 1. Get Values
+            let votePercentA = parseInt(inputVoteA.value);
+            let votePercentB = 100 - votePercentA;
+            let distSeatsA = parseInt(inputDistA.value);
+            let distSeatsB = parseInt(inputDistB.value);
+
+            // Validation: District seats cannot exceed 50 total
+            if (distSeatsA + distSeatsB > 50) {
+                // simple adjustment logic: decrease the one currently not being moved? 
+                // For simplicity in this vanilla JS, just clamp B if A moved, or clamp A if B moved is hard to detect without event source.
+                // Let's just visually warn or allow it but clamp calculations? 
+                // Let's cap the 'other' one to fit.
+                // This is a simple UI fix:
+                // ideally we use a linked slider, but here we just trust the math below clamps max values.
+            }
+
+            // Update Text Displays
+            valVoteA.textContent = votePercentA;
+            valVoteB.textContent = votePercentB;
+            barVoteB.style.width = votePercentB + '%';
+            
+            valDistA.textContent = distSeatsA;
+            valDistB.textContent = distSeatsB;
+
+            // --- CALCULATION: PARALLEL (並立制) ---
+            // Formula: District Wins + (List Total * Party %)
+            
+            let paraListA = Math.round(LIST_SEATS * (votePercentA / 100));
+            let paraListB = LIST_SEATS - paraListA; // Ensure sum is 50
+
+            let paraTotalA = distSeatsA + paraListA;
+            let paraTotalB = distSeatsB + paraListB;
+
+            // Update DOM Parallel
+            document.getElementById('res-para-dist-a').textContent = distSeatsA;
+            document.getElementById('res-para-list-a').textContent = paraListA;
+            document.getElementById('res-para-total-a').textContent = paraTotalA;
+            
+            document.getElementById('vis-para-dist-a').style.width = (distSeatsA / (paraTotalA || 1) * 100) + '%';
+            document.getElementById('vis-para-dist-a').textContent = distSeatsA > 0 ? distSeatsA : '';
+            document.getElementById('vis-para-list-a').style.width = (paraListA / (paraTotalA || 1) * 100) + '%';
+            document.getElementById('vis-para-list-a').textContent = paraListA > 0 ? paraListA : '';
+
+            document.getElementById('res-para-dist-b').textContent = distSeatsB;
+            document.getElementById('res-para-list-b').textContent = paraListB;
+            document.getElementById('res-para-total-b').textContent = paraTotalB;
+
+            document.getElementById('vis-para-dist-b').style.width = (distSeatsB / (paraTotalB || 1) * 100) + '%';
+            document.getElementById('vis-para-dist-b').textContent = distSeatsB > 0 ? distSeatsB : '';
+            document.getElementById('vis-para-list-b').style.width = (paraListB / (paraTotalB || 1) * 100) + '%';
+            document.getElementById('vis-para-list-b').textContent = paraListB > 0 ? paraListB : '';
+
+
+            // --- CALCULATION: MMP (聯立制) ---
+            // Formula: Target Total = Total Seats * Party %. 
+            // List Seats = Target - District Wins. (Cannot be < 0)
+            
+            let mmpTargetA = Math.round(TOTAL_SEATS * (votePercentA / 100));
+            let mmpListA = mmpTargetA - distSeatsA;
+            let overhangA = false;
+
+            if (mmpListA < 0) {
+                mmpListA = 0; // Overhang!
+                overhangA = true;
+            }
+            let mmpTotalA = distSeatsA + mmpListA;
+
+            let mmpTargetB = Math.round(TOTAL_SEATS * (votePercentB / 100));
+            let mmpListB = mmpTargetB - distSeatsB;
+            let overhangB = false;
+
+            if (mmpListB < 0) {
+                mmpListB = 0;
+                overhangB = true;
+            }
+            let mmpTotalB = distSeatsB + mmpListB;
+
+            // Update DOM MMP
+            document.getElementById('res-mmp-target-a').textContent = mmpTargetA;
+            document.getElementById('res-mmp-dist-a').textContent = distSeatsA;
+            document.getElementById('res-mmp-total-a').textContent = mmpTotalA;
+            
+            // Marker position (Target %)
+            document.getElementById('mark-mmp-a').style.left = (mmpTargetA) + '%'; 
+            // Note: Since total seats in MMP might exceed 100 due to overhang, percentage width is relative to CURRENT total, 
+            // but for comparison visualization, let's keep it relative to 100 width container for simplicity, 
+            // or allow the bar to overflow slightly? Let's use flex ratios.
+            // Actually, simply setting width % relative to 100 (container) is easiest for understanding.
+            
+            document.getElementById('vis-mmp-dist-a').style.width = distSeatsA + '%';
+            document.getElementById('vis-mmp-dist-a').textContent = distSeatsA > 0 ? distSeatsA : '';
+            document.getElementById('vis-mmp-list-a').style.width = mmpListA + '%';
+            document.getElementById('vis-mmp-list-a').textContent = mmpListA > 0 ? mmpListA : '';
+            
+            document.getElementById('overhang-msg-a').style.display = overhangA ? 'block' : 'none';
+
+
+            document.getElementById('res-mmp-target-b').textContent = mmpTargetB;
+            document.getElementById('res-mmp-dist-b').textContent = distSeatsB;
+            document.getElementById('res-mmp-total-b').textContent = mmpTotalB;
+
+            document.getElementById('mark-mmp-b').style.left = (mmpTargetB) + '%';
+            
+            document.getElementById('vis-mmp-dist-b').style.width = distSeatsB + '%';
+            document.getElementById('vis-mmp-dist-b').textContent = distSeatsB > 0 ? distSeatsB : '';
+            document.getElementById('vis-mmp-list-b').style.width = mmpListB + '%';
+            document.getElementById('vis-mmp-list-b').textContent = mmpListB > 0 ? mmpListB : '';
+        }
+
+        // Logic to prevent sliders form crossing impossible values
+        inputDistA.addEventListener('input', () => {
+             if(parseInt(inputDistA.value) + parseInt(inputDistB.value) > 50) {
+                 inputDistB.value = 50 - parseInt(inputDistA.value);
+             }
+             updateSimulation();
+        });
+
+        inputDistB.addEventListener('input', () => {
+             if(parseInt(inputDistA.value) + parseInt(inputDistB.value) > 50) {
+                 inputDistA.value = 50 - parseInt(inputDistB.value);
+             }
+             updateSimulation();
+        });
+
+        inputVoteA.addEventListener('input', updateSimulation);
+
+        // Init
+        updateSimulation();
+
+    </script>
+</body>
+</html>
