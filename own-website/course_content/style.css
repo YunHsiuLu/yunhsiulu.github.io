@@ -1,0 +1,158 @@
+/* --- 全局基礎樣式 --- */
+body {
+    font-family: "Microsoft JhengHei", "Heiti TC", sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 98%;
+    margin: 0 auto;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+}
+
+/* 選單區域 */
+.controls {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+select {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 2px solid #3498db;
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* --- 統計區塊 --- */
+.stats-bar {
+    background-color: #e3f2fd;
+    border: 1px solid #90caf9;
+    color: #1565c0;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.stat-item {
+    text-align: center;
+    background: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+    min-width: 150px;
+}
+
+.stat-label {
+    font-size: 0.85em;
+    color: #7f8c8d;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.stat-value span {
+    font-size: 0.6em;
+    font-weight: normal;
+    color: #888;
+    margin-left: 2px;
+}
+
+/* --- 卡片與表格 --- */
+.class-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    margin: 0 auto 30px auto;
+    max-width: 900px;
+    overflow: hidden;
+}
+
+.card-header {
+    background-color: #3498db;
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.class-name { font-size: 1.5em; font-weight: bold; }
+.class-note { font-size: 0.9em; background: rgba(255, 255, 255, 0.2); padding: 4px 10px; border-radius: 15px; }
+
+.single-table { width: 100%; border-collapse: collapse; }
+.single-table th, .single-table td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+.single-table th { background-color: #f8f9fa; color: #555; }
+.past-class td { opacity: 0.5; }
+
+/* --- 矩陣視圖 --- */
+.matrix-container {
+    overflow-x: auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    padding: 10px;
+}
+
+.matrix-table { width: 100%; border-collapse: collapse; min-width: 1200px; }
+.matrix-table th, .matrix-table td { border: 1px solid #ddd; padding: 6px; text-align: center; vertical-align: top; font-size: 14px; }
+.matrix-table thead th { background-color: #2c3e50; color: white; position: sticky; top: 0; z-index: 10; padding: 10px; }
+.matrix-stat-row td { background-color: #e8f6f3; border-bottom: 2px solid #1abc9c; color: #16a085; font-size: 0.85em; text-align: left; padding: 8px; }
+
+/* --- 課程內容樣式 --- */
+.content-cell {
+    text-align: left;
+    margin-bottom: 4px;
+    padding: 5px;
+    border-radius: 4px;
+    background-color: #fdfdfd;
+    border: 1px solid #eee;
+}
+
+.content-text {
+    color: #2980b9;
+    font-weight: bold;
+    line-height: 1.35;
+    padding: 2px 4px;
+    border-radius: 3px;
+    cursor: default; /* 強制預設游標 */
+}
+
+/* --- 特殊狀態顏色 --- */
+.type-holiday { background-color: #ffebee !important; border-color: #ffcdd2 !important; }
+.type-holiday .content-text { color: #c62828 !important; }
+
+.type-exam { background-color: #fff8e1 !important; border-color: #ffe0b2 !important; }
+.type-exam .content-text { color: #ef6c00 !important; }
+
+.type-quiz { background-color: #ffffe0 !important; border-color: #fff9c4 !important; }
+.type-quiz .content-text { color: #f9a825 !important; }
+
+tr.row-holiday { background-color: #ffebee !important; }
+tr.row-holiday td { color: #c62828; font-weight: bold; }
+
+tr.row-exam { background-color: #fff8e1 !important; }
+tr.row-exam td { color: #ef6c00; font-weight: bold; }
+
+tr.row-quiz { background-color: #ffffe0 !important; }
+tr.row-quiz td { color: #f9a825; font-weight: bold; }

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>班級課程進度總表</title>
+    <!-- 引用 CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>📅 班級課程進度總表</h1>
+        
+        <div class="controls">
+            <select id="classSelector" onchange="switchView()">
+                <option value="" disabled selected>▼ 請選擇班級</option>
+                <option value="all">顯示全部 (週次矩陣表)</option>
+                <option value="401">401 班</option>
+                <option value="403">403 班</option>
+                <option value="404">404 班</option>
+                <option value="406">406 班</option>
+                <option value="407">407 班</option>
+                <option value="409">409 班</option>
+                <option value="410">410 班</option>
+            </select>
+        </div>
+
+        <div id="displayArea">
+            <!-- 課程內容顯示區 -->
+        </div>
+    </div>
+
+    <!-- 引用 JS (放在 body 結尾) -->
+    <script src="script.js"></script>
+</body>
+</html>
