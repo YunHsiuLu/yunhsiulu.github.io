@@ -17,77 +17,7 @@ const keywords = {
 };
 
 // --- 全局變數 ---
-let isEditMode = false;
-
-// --- 功能：切換編輯模式 ---
-function toggleEditMode() {
-    isEditMode = !isEditMode;
-    
-    const btn = document.getElementById('modeToggle');
-    const body = document.body;
-
-    if (isEditMode) {
-        btn.innerHTML = '🖊️';
-        btn.classList.add('active');
-        body.classList.add('edit-mode-active');
-    } else {
-        btn.innerHTML = '👀';
-        btn.classList.remove('active');
-        body.classList.remove('edit-mode-active');
-    }
-
-    const allContentCells = document.querySelectorAll('.content-text');
-    allContentCells.forEach(cell => {
-        cell.contentEditable = isEditMode;
-    });
-}
-
-// --- 存檔功能 ---
-async function saveContent(element, classId, date, period) {
-    if (!isEditMode) return;
-
-    const newContent = element.innerText.trim();
-    const statusBox = document.getElementById('saveStatus');
-    
-    try {
-        const response = await fetch('/save', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                classId: classId,
-                date: date,
-                period: period,
-                content: newContent
-            })
-        });
-
-        if (response.ok) {
-            statusBox.innerText = `✅ 已儲存 (${classId})`;
-            statusBox.style.backgroundColor = "#2ecc71";
-            statusBox.style.opacity = 1;
-            setTimeout(() => { statusBox.style.opacity = 0; }, 2500);
-            
-            // 簡單觸發重新渲染 (為了讓顏色即時更新，建議直接 reload 或優化 DOM 操作)
-            // 這裡為了保持簡單，我們只更新當下格子的顏色(若有需要)
-            // 但因為涉及到 CSS class 的變化，最簡單的方式是重新呼叫 switchView()
-            // switchView(); // 若覺得閃爍可以註解掉
-        } else {
-            throw new Error();
-        }
-    } catch (error) {
-        console.error(error);
-        statusBox.innerText = "❌ 儲存失敗";
-        statusBox.style.backgroundColor = "#e74c3c";
-        statusBox.style.opacity = 1;
-    }
-}
-
-function handleEnter(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        e.target.blur();
-    }
-}
+// 已移除編輯模式相關變數
 
 // --- 輔助函式 ---
 function parseDate(dateStr) {
@@ -207,16 +137,10 @@ async function renderMatrixView() {
                         else if (type === 'exam') extraClass = 'type-exam';
                         else if (type === 'quiz') extraClass = 'type-quiz'; // 新增
                         
-                        const editableAttr = isEditMode ? 'contenteditable="true"' : 'contenteditable="false"';
-
                         cellContent += `
                             <div class="content-cell ${extraClass}">
                                 <span>(${c.weekday})</span>
-                                <div class="content-text" 
-                                     ${editableAttr}
-                                     onkeydown="handleEnter(event)"
-                                     onblur="saveContent(this, '${cls}', '${c.date}', '${c.period}')"
-                                >${c.content}</div>
+                                <div class="content-text">${c.content}</div>
                             </div>`;
                     });
                 }
@@ -259,19 +183,13 @@ async function renderSingleClassView(classId) {
 
             if (dateObj < today && type === 'normal') rowClass += ' past-class';
 
-            const editableAttr = isEditMode ? 'contenteditable="true"' : 'contenteditable="false"';
-
             rows += `
                 <tr class="${rowClass}">
                     <td>第 ${weekNum} 週</td>
                     <td>${item.date} (${item.weekday})</td>
                     <td>${item.period}</td>
                     <td>
-                        <div class="content-text"
-                             ${editableAttr}
-                             onkeydown="handleEnter(event)"
-                             onblur="saveContent(this, '${classId}', '${item.date}', '${item.period}')"
-                        >${item.content}</div>
+                        <div class="content-text">${item.content}</div>
                     </td>
                 </tr>`;
         });
