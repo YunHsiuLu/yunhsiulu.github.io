@@ -1,0 +1,16 @@
+{
+  "name": "class-schedule",
+  "version": "1.0.0",
+  "description": "班級排程系統",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
