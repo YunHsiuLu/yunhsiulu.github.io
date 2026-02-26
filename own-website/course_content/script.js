@@ -13,7 +13,8 @@ const exam3Start = new Date(2026, 5, 26);
 const keywords = {
     holiday: ['放假', '停課', '調課', '連假', '春假', '國定假日', '校慶補假'],
     exam: ['段考'],
-    quiz: ['小考'] 
+    quiz: ['小考'],
+    exercise: ['練習']
 };
 
 // --- 全局變數 ---
@@ -33,8 +34,8 @@ function getContentType(text, dateStr) {
     
     if (keywords.holiday.some(k => text.includes(k))) return 'holiday';
     if (keywords.exam.some(k => text.includes(k))) return 'exam';
-    if (keywords.quiz.some(k => text.includes(k))) return 'quiz'; // 新增這行
-    
+    if (keywords.quiz.some(k => text.includes(k))) return 'quiz';
+    if (keywords.exercise.some(k => text.includes(k))) return 'exercise';
     return 'normal';
 }
 
@@ -131,11 +132,11 @@ async function renderMatrixView() {
                     cellData.forEach(c => {
                         const type = getContentType(c.content, c.date);
                         
-                        // ★★★ 修改處：加入 quiz 的 class 判斷 ★★★
                         let extraClass = '';
                         if (type === 'holiday') extraClass = 'type-holiday';
                         else if (type === 'exam') extraClass = 'type-exam';
-                        else if (type === 'quiz') extraClass = 'type-quiz'; // 新增
+                        else if (type === 'quiz') extraClass = 'type-quiz';
+                        else if (type === 'exercise') extraClass = 'type-exercise';
                         
                         cellContent += `
                             <div class="content-cell ${extraClass}">
@@ -175,11 +176,11 @@ async function renderSingleClassView(classId) {
             const weekNum = Math.floor((Math.ceil((dateObj - semesterStart) / 86400000)) / 7) + 1;
             const type = getContentType(item.content, item.date);
             
-            // ★★★ 修改處：加入 quiz 的 class 判斷 ★★★
             let rowClass = '';
             if (type === 'holiday') rowClass = 'row-holiday';
             else if (type === 'exam') rowClass = 'row-exam';
-            else if (type === 'quiz') rowClass = 'row-quiz'; // 新增
+            else if (type === 'quiz') rowClass = 'row-quiz';
+            else if (type === 'exercise') rowClass = 'row-exercise';
 
             if (dateObj < today && type === 'normal') rowClass += ' past-class';
 

@@ -147,9 +147,13 @@ select {
 .type-exam .content-text { color: #ef6c00 !important; }
 .type-quiz { background-color: #ffffe0 !important; border-color: #fff9c4 !important; }
 .type-quiz .content-text { color: #f9a825 !important; /* 深金黃色，確保可讀性 */ }
+.type-exercise { background-color: #a8a8a8 !important; border-color: #8c8c8c !important; }
+.type-exercise .content-text { color: #696969 !important; }
 tr.row-holiday { background-color: #ffebee !important; }
 tr.row-holiday td { color: #c62828; font-weight: bold; }
 tr.row-exam { background-color: #fff8e1 !important; }
 tr.row-exam td { color: #ef6c00; font-weight: bold; }
 tr.row-quiz { background-color: #ffffe0 !important; }
 tr.row-quiz td { color: #f9a825; font-weight: bold; }
+tr.row-exercise { background-color: #a8a8a8 !important; }
+tr.row-exercise td { color: #696969; font-weight: bold; }
