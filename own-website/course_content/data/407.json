@@ -15,34 +15,40 @@
       "content": "2-1~2-2"
     },
     {
+      "date": "03/03",
+      "weekday": "週二",
+      "period": "09:00-10:00",
+      "content": "2-3"
+    },
+    {
       "date": "03/04",
       "weekday": "週三",
       "period": "11:00-12:00",
-      "content": "2-2~2-3"
+      "content": "練習1-1~2-2"
     },
     {
       "date": "03/05",
       "weekday": "週四",
       "period": "13:00-14:00",
-      "content": "3-1"
+      "content": "（調課至週二第二節上課）"
     },
     {
       "date": "03/11",
       "weekday": "週三",
       "period": "11:00-12:00",
-      "content": "3-1~3-2"
+      "content": "2-3~3-1"
     },
     {
       "date": "03/12",
       "weekday": "週四",
       "period": "13:00-14:00",
-      "content": "小考3-1"
+      "content": "3-1~3-2"
     },
     {
       "date": "03/18",
       "weekday": "週三",
       "period": "11:00-12:00",
-      "content": "3-2"
+      "content": "小考3-1"
     },
     {
       "date": "03/19",
@@ -54,13 +60,13 @@
       "date": "03/25",
       "weekday": "週三",
       "period": "11:00-12:00",
-      "content": "小考3-2"
+      "content": "3-2"
     },
     {
       "date": "03/26",
       "weekday": "週四",
       "period": "13:00-14:00",
-      "content": "檢討考卷、自習、問問題"
+      "content": "小考3-2"
     },
     {
       "date": "04/01",
