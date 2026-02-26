@@ -18,7 +18,77 @@ const keywords = {
 };
 
 // --- 全局變數 ---
-// 已移除編輯模式相關變數
+let isEditMode = false;
+
+// --- 功能：切換編輯模式 ---
+function toggleEditMode() {
+    isEditMode = !isEditMode;
+    
+    const btn = document.getElementById('modeToggle');
+    const body = document.body;
+
+    if (isEditMode) {
+        btn.innerHTML = '🖊️';
+        btn.classList.add('active');
+        body.classList.add('edit-mode-active');
+    } else {
+        btn.innerHTML = '👀';
+        btn.classList.remove('active');
+        body.classList.remove('edit-mode-active');
+    }
+
+    const allContentCells = document.querySelectorAll('.content-text');
+    allContentCells.forEach(cell => {
+        cell.contentEditable = isEditMode;
+    });
+}
+
+// --- 存檔功能 ---
+async function saveContent(element, classId, date, period) {
+    if (!isEditMode) return;
+
+    const newContent = element.innerText.trim();
+    const statusBox = document.getElementById('saveStatus');
+    
+    try {
+        const response = await fetch('/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                classId: classId,
+                date: date,
+                period: period,
+                content: newContent
+            })
+        });
+
+        if (response.ok) {
+            statusBox.innerText = `✅ 已儲存 (${classId})`;
+            statusBox.style.backgroundColor = "#2ecc71";
+            statusBox.style.opacity = 1;
+            setTimeout(() => { statusBox.style.opacity = 0; }, 2500);
+            
+            // 簡單觸發重新渲染 (為了讓顏色即時更新，建議直接 reload 或優化 DOM 操作)
+            // 這裡為了保持簡單，我們只更新當下格子的顏色(若有需要)
+            // 但因為涉及到 CSS class 的變化，最簡單的方式是重新呼叫 switchView()
+            // switchView(); // 若覺得閃爍可以註解掉
+        } else {
+            throw new Error();
+        }
+    } catch (error) {
+        console.error(error);
+        statusBox.innerText = "❌ 儲存失敗";
+        statusBox.style.backgroundColor = "#e74c3c";
+        statusBox.style.opacity = 1;
+    }
+}
+
+function handleEnter(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        e.target.blur();
+    }
+}
 
 // --- 輔助函式 ---
 function parseDate(dateStr) {
@@ -34,8 +104,9 @@ function getContentType(text, dateStr) {
     
     if (keywords.holiday.some(k => text.includes(k))) return 'holiday';
     if (keywords.exam.some(k => text.includes(k))) return 'exam';
-    if (keywords.quiz.some(k => text.includes(k))) return 'quiz';
+    if (keywords.quiz.some(k => text.includes(k))) return 'quiz'; // 新增這行
     if (keywords.exercise.some(k => text.includes(k))) return 'exercise';
+
     return 'normal';
 }
 
@@ -132,16 +203,23 @@ async function renderMatrixView() {
                     cellData.forEach(c => {
                         const type = getContentType(c.content, c.date);
                         
+                        // ★★★ 修改處：加入 quiz 的 class 判斷 ★★★
                         let extraClass = '';
                         if (type === 'holiday') extraClass = 'type-holiday';
                         else if (type === 'exam') extraClass = 'type-exam';
-                        else if (type === 'quiz') extraClass = 'type-quiz';
+                        else if (type === 'quiz') extraClass = 'type-quiz'; // 新增
                         else if (type === 'exercise') extraClass = 'type-exercise';
                         
+                        const editableAttr = isEditMode ? 'contenteditable="true"' : 'contenteditable="false"';
+
                         cellContent += `
                             <div class="content-cell ${extraClass}">
                                 <span>(${c.weekday})</span>
-                                <div class="content-text">${c.content}</div>
+                                <div class="content-text" 
+                                     ${editableAttr}
+                                     onkeydown="handleEnter(event)"
+                                     onblur="saveContent(this, '${cls}', '${c.date}', '${c.period}')"
+                                >${c.content}</div>
                             </div>`;
                     });
                 }
@@ -176,13 +254,16 @@ async function renderSingleClassView(classId) {
             const weekNum = Math.floor((Math.ceil((dateObj - semesterStart) / 86400000)) / 7) + 1;
             const type = getContentType(item.content, item.date);
             
+            // ★★★ 修改處：加入 quiz 的 class 判斷 ★★★
             let rowClass = '';
             if (type === 'holiday') rowClass = 'row-holiday';
             else if (type === 'exam') rowClass = 'row-exam';
-            else if (type === 'quiz') rowClass = 'row-quiz';
+            else if (type === 'quiz') rowClass = 'row-quiz'; // 新增
             else if (type === 'exercise') rowClass = 'row-exercise';
 
             if (dateObj < today && type === 'normal') rowClass += ' past-class';
+
+            const editableAttr = isEditMode ? 'contenteditable="true"' : 'contenteditable="false"';
 
             rows += `
                 <tr class="${rowClass}">
@@ -190,7 +271,11 @@ async function renderSingleClassView(classId) {
                     <td>${item.date} (${item.weekday})</td>
                     <td>${item.period}</td>
                     <td>
-                        <div class="content-text">${item.content}</div>
+                        <div class="content-text"
+                             ${editableAttr}
+                             onkeydown="handleEnter(event)"
+                             onblur="saveContent(this, '${classId}', '${item.date}', '${item.period}')"
+                        >${item.content}</div>
                     </td>
                 </tr>`;
         });
