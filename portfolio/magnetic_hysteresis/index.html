@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>物理教學教材：磁滯現象</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --main-bg: #ffffff; --ctrl-bg: #fdfdfd; --text-color: #2c3e50; --accent: #e67e22; }
+        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: #eaeff2; color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        h1 { font-size: 2.2rem; margin-bottom: 20px; color: #1a1a1a; }
+        .lab-bench { display: flex; gap: 30px; background: var(--main-bg); padding: 40px; border-radius: 25px; box-shadow: 0 15px 45px rgba(0,0,0,0.15); width: 98%; max-width: 1300px; }
+        .viz-area { flex: 1.5; display: flex; flex-direction: column; gap: 25px; min-width: 0; }
+        .controls { flex: 0 0 380px; padding: 30px; background: var(--ctrl-bg); border-radius: 20px; border: 2px solid #e0e6ed; display: flex; flex-direction: column; gap: 30px; }
+        canvas { background: #fff; border: 1px solid #dcdde1; border-radius: 12px; }
+        .section-label { font-size: 1.4rem; font-weight: 800; margin-bottom: 12px; border-left: 6px solid var(--accent); padding-left: 15px; }
+        .readout-box { font-family: "Courier New", monospace; font-size: 1.5rem; color: #27ae60; background: #2c3e50; padding: 5px 15px; border-radius: 8px; display: inline-block; min-width: 60px; text-align: center; }
+        input[type="range"] { width: 100%; height: 12px; cursor: pointer; margin-top: 10px; }
+        .compact-row { display: flex; align-items: flex-start; gap: 30px; height: 350px; }
+        .chart-container { flex: 1; height: 100%; }
+        select { font-size: 1.2rem; padding: 10px; border-radius: 8px; border: 2px solid #ddd; width: 100%; }
+        button { font-size: 1.3rem; padding: 18px; background: #c0392b; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        button:hover { background: #e74c3c; }
+        .pedagogy-tip { font-size: 1.1rem; line-height: 1.6; color: #636e72; background: #f1f2f6; padding: 15px; border-radius: 10px; border: 1px dashed #b2bec3; }
+    </style>
+</head>
+<body>
+
+<h1>磁滯現象演示：磁疇、地磁與校準</h1>
+
+<div class="lab-bench">
+    <div class="viz-area">
+        <div>
+            <div class="section-label">微觀磁疇狀態 (Microscopic Magnetic Domains)</div>
+            <canvas id="domainCanvas" height="150"></canvas>
+        </div>
+
+        <div class="compact-row">
+            <div style="text-align:center; width: 220px;">
+                <div class="section-label">磁場檢測計</div>
+                <canvas id="detector" width="200" height="200"></canvas>
+                <div style="margin-top:15px; font-size: 1.2rem;">偏轉角 \(\theta\): <span class="readout-box" id="angleText">0°</span></div>
+            </div>
+            <div class="chart-container">
+                <div class="section-label">\(B-H\) 磁滯曲線回饋</div>
+                <canvas id="hChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div>
+            <div class="section-label">1. 儀器校準方位角 (\(\phi\))</div>
+            <input type="range" id="rotSlider" min="0" max="360" value="0">
+            <div style="text-align:right; margin-top:10px; font-size:1.2rem;">\(\phi = \) <span id="rotText">0</span>°</div>
+        </div>
+
+        <div>
+            <div class="section-label">2. 螺線管電流 \(I\) (\(H\) 場)</div>
+            <input type="range" id="fieldSlider" min="-100" max="100" value="0">
+            <div style="text-align:right; margin-top:10px; font-size:1.2rem;">\(H \approx \) <span class="readout-box" id="fieldVal">0</span></div>
+        </div>
+
+        <div>
+            <div class="section-label">3. 實驗材料設定</div>
+            <select id="matType">
+                <option value="soft">軟鐵 (Soft Iron)</option>
+                <option value="hard">鋼鐵 (Hard Steel)</option>
+            </select>
+        </div>
+
+        <button onclick="fullReset()">執行消磁程序並歸零</button>
+
+        <div class="pedagogy-tip">
+            <strong>演示引導：</strong><br>
+            • 點擊上方按鈕可模擬系統回復到<b>熱平衡隨機態</b>。<br>
+            • 此時電流 \(I=0\)，若指針仍有偏轉，即為地磁干擾，請調整旋鈕 \(\phi\) 校準。
+        </div>
+    </div>
+</div>
+
+<script>
+const dCanvas = document.getElementById('domainCanvas'), dCtx = dCanvas.getContext('2d');
+const detCanvas = document.getElementById('detector'), detCtx = detCanvas.getContext('2d');
+const fieldSlider = document.getElementById('fieldSlider');
+
+let M = 0; 
+let lastChartH = null;
+const Be = 8; 
+const randomNorth = Math.random() * 360; 
+let domains = [];
+
+function initDomains() {
+    dCanvas.width = dCanvas.offsetWidth;
+    domains = [];
+    for(let i=0; i<22; i++) {
+        for(let j=0; j<4; j++) {
+            domains.push({ 
+                x: 40 + i * (dCanvas.width-80)/21, 
+                y: 30 + j * (dCanvas.height-60)/3, 
+                angle: Math.random() * Math.PI * 2 
+            });
+        }
+    }
+}
+
+const chart = new Chart(document.getElementById('hChart'), {
+    type: 'scatter',
+    data: { datasets: [{ label: 'B-H', borderColor: '#e74c3c', showLine: true, pointRadius: 0, data: [], tension: 0.1, borderWidth: 3 }] },
+    options: { 
+        scales: { 
+            x: { type: 'linear', position: 'center', min:-110, max:110, ticks: {font:{size:14}}, title:{display:true, text:'外部場 H', font:{size:16, weight:'bold'}} }, 
+            y: { type: 'linear', position: 'center', min:-120, max:120, ticks: {font:{size:14}}, title:{display:true, text:'總感應場 B', font:{size:16, weight:'bold'}} } 
+        },
+        plugins: { legend: { display: false } },
+        animation: false, maintainAspectRatio: false 
+    }
+});
+
+function drawCompass(ctx, angle) {
+    ctx.clearRect(0,0,200,200);
+    ctx.save(); ctx.translate(100, 100);
+    ctx.beginPath(); ctx.arc(0,0,85,0,Math.PI*2); ctx.strokeStyle="#2c3e50"; ctx.lineWidth=3; ctx.stroke();
+    ctx.rotate(angle);
+    ctx.fillStyle="#e74c3c"; ctx.beginPath(); ctx.moveTo(0,-70); ctx.lineTo(10,0); ctx.lineTo(-10,0); ctx.fill();
+    ctx.fillStyle="#bdc3c7"; ctx.beginPath(); ctx.moveTo(0,70); ctx.lineTo(10,0); ctx.lineTo(-10,0); ctx.fill();
+    ctx.restore();
+}
+
+function update() {
+    const rot = parseFloat(document.getElementById('rotSlider').value);
+    const H = parseFloat(fieldSlider.value);
+    const mat = document.getElementById('matType').value === 'soft' ? {f:3, s:0.25} : {f:22, s:0.12};
+
+    let diff = H - M;
+    if (Math.abs(diff) > mat.f) M += (diff - Math.sign(diff) * mat.f) * mat.s;
+
+    let earthAngle = (randomNorth - rot) * Math.PI / 180;
+    let finalAngle = Math.atan2(Be * Math.sin(earthAngle) + H + M, Be * Math.cos(earthAngle));
+    drawCompass(detCtx, finalAngle);
+
+    dCtx.clearRect(0,0,dCanvas.width,dCanvas.height);
+    domains.forEach(d => {
+        let alignStrength = Math.min(Math.abs(M)/100, 1);
+        if (alignStrength > 0.05) {
+            let target = M > 0 ? 0 : Math.PI;
+            let aDiff = target - d.angle;
+            while(aDiff > Math.PI) aDiff -= Math.PI*2;
+            while(aDiff < -Math.PI) aDiff += Math.PI*2;
+            d.angle += aDiff * alignStrength * 0.15;
+        }
+        dCtx.save(); dCtx.translate(d.x, d.y); dCtx.rotate(d.angle);
+        dCtx.beginPath(); dCtx.strokeStyle="#2c3e50"; dCtx.lineWidth=2;
+        dCtx.moveTo(-10,0); dCtx.lineTo(10,0); dCtx.lineTo(5,-4); dCtx.stroke();
+        dCtx.restore();
+    });
+
+    let currentB = M + H * 0.15;
+    if (lastChartH === null || Math.abs(H - lastChartH) > 0.8) {
+        chart.data.datasets[0].data.push({x: H, y: currentB});
+        lastChartH = H;
+        if (chart.data.datasets[0].data.length > 400) chart.data.datasets[0].data.shift();
+    }
+    chart.update('none');
+
+    document.getElementById('rotText').innerText = rot;
+    document.getElementById('fieldVal').innerText = Math.round(H);
+    document.getElementById('angleText').innerText = Math.round(finalAngle * 180 / Math.PI) + "°";
+    requestAnimationFrame(update);
+}
+
+function fullReset() {
+    // 1. 電流歸零
+    fieldSlider.value = 0;
+    // 2. 磁性歸零與打亂
+    M = 0; 
+    chart.data.datasets[0].data = [];
+    domains.forEach(d => d.angle = Math.random() * Math.PI * 2);
+}
+
+window.addEventListener('resize', initDomains);
+initDomains();
+update();
+</script>
+</body>
+</html>

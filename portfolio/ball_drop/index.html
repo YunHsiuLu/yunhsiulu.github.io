@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物理模擬：重力、保守力與能量轉換</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="simulation-box">
+            <h3>重力實驗模擬場</h3>
+            <canvas id="simCanvas"></canvas>
+            <div class="controls">
+                <button id="dropBtn">放手落下</button>
+                <button id="resetBtn">重置實驗</button>
+            </div>
+            <p class="hint">操作提示：使用滑鼠拖拽球體到任意位置，觀察位能變化。</p>
+        </div>
+
+        <div class="energy-panel">
+            <h3>即時能量數據分析</h3>
+            <div class="stats">
+                <div class="stat-item"><span class="label">總能 (TE)</span><br><span id="teVal">0</span> J</div>
+                <div class="stat-item"><span class="label">位能 (PE)</span><br><span id="peVal">0</span> J</div>
+                <div class="stat-item"><span class="label">動能 (KE)</span><br><span id="keVal">0</span> J</div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="energyChart"></canvas>
+            </div>
+
+            <div class="settings">
+                <div class="slider-header">
+                    <span class="label">恢復係數 (e): <strong id="eValDisplay">1.0</strong></span>
+                </div>
+                <input type="range" id="eSlider" min="0" max="1" step="0.1" value="1.0">
+                <div class="slider-labels">
+                    <span>0.0 (非彈性)</span>
+                    <span>1.0 (完全彈性)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

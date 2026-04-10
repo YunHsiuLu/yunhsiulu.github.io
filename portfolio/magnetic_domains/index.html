@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>物理教材：磁疇演化與剩磁</title>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root { --main-bg: #eaeff2; --lab-bg: #ffffff; --text-color: #2c3e50; --accent: #e67e22; }
+        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background: var(--main-bg); color: var(--text-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; user-select: none; }
+        h1 { font-size: 2.2rem; margin-bottom: 20px; color: #1a1a1a; }
+        .lab-bench { display: flex; gap: 30px; background: var(--lab-bg); padding: 35px; border-radius: 25px; box-shadow: 0 15px 45px rgba(0,0,0,0.1); width: 95%; max-width: 1250px; }
+        .stage-area { flex: 1.8; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .stage { position: relative; border: 4px solid #7f8c8d; border-radius: 20px; background: #fff; width: 850px; height: 550px; overflow: hidden; cursor: crosshair; }
+        #domainCanvas { display: block; width: 100%; height: 100%; }
+        #magnet {
+            position: absolute; width: 150px; height: 70px;
+            background: linear-gradient(to right, #e74c3c 50%, #3498db 50%);
+            border-radius: 10px; color: white; line-height: 70px; font-weight: bold; font-size: 1.4rem; text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3); z-index: 10; cursor: move;
+        }
+        .controls { flex: 0 0 350px; padding: 25px; background: #fdfdfd; border-radius: 20px; border: 2px solid #e0e6ed; display: flex; flex-direction: column; gap: 25px; }
+        .section-label { font-size: 1.4rem; font-weight: 800; border-left: 6px solid var(--accent); padding-left: 15px; margin-bottom: 12px; }
+        button { font-size: 1.3rem; padding: 18px; background: var(--accent); color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; box-shadow: 0 5px 0 #b35d10; }
+        button:hover { background: #d35400; transform: translateY(-2px); }
+        button:active { transform: translateY(2px); box-shadow: none; }
+        .readout-box { font-family: inherit; font-size: 1.2rem; color: #ffffff; background: #2c3e50; padding: 5px 12px; border-radius: 8px; display: inline-block; min-width: 120px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<h1>物理教材：鐵磁材料微觀演化與向量場</h1>
+
+<div class="lab-bench">
+    <div class="stage-area">
+        <div class="section-label">實驗演示區</div>
+        <div class="stage" id="stage">
+            <div id="magnet">N&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;S</div>
+            <canvas id="domainCanvas"></canvas>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div>
+            <div class="section-label">狀態讀數</div>
+            <div style="font-size: 1.2rem; margin-bottom: 15px;">
+                外部磁場：<span class="readout-box" id="hFieldContainer">\(\vec{H}_{net}\)</span>
+            </div>
+            <div style="font-size: 1.2rem;">
+                材料磁性：<span class="readout-box" id="mFieldText">無磁性</span>
+            </div>
+        </div>
+
+        <button onclick="degauss()">打亂磁性 (消磁程序)</button>
+
+        <div style="font-size: 1rem; color: #636e72; background: #f1f2f6; padding: 15px; border-radius: 10px; line-height: 1.5;">
+            <strong>物理重點提醒：</strong><br>
+            • **剩磁（Remanence）**：磁鐵移開（\(H \approx 0\)）後，若材料磁性讀數仍不為零，即展現了磁滯現象中的剩磁。<br>
+            • **矯頑力（Coercivity）**：需反轉磁鐵方向靠近，才能使剩磁歸零。
+        </div>
+    </div>
+</div>
+
+<script>
+const canvas = document.getElementById('domainCanvas'), ctx = canvas.getContext('2d');
+const magnet = document.getElementById('magnet'), stage = document.getElementById('stage');
+const hContainer = document.getElementById('hFieldContainer');
+const mText = document.getElementById('mFieldText');
+
+let dipoles = [];
+let isDragging = false, offsetX, offsetY;
+const dipoleRows = 12, dipoleCols = 24;
+const matX = 225, matY = 175, matW = 400, matH = 200;
+
+function init() {
+    canvas.width = stage.offsetWidth; canvas.height = stage.offsetHeight;
+    dipoles = [];
+    const spacingX = (matW - 40) / (dipoleCols - 1);
+    const spacingY = (matH - 40) / (dipoleRows - 1);
+    for (let i = 0; i < dipoleCols; i++) {
+        for (let j = 0; j < dipoleRows; j++) {
+            dipoles.push({
+                x: matX + 20 + i * spacingX, y: matY + 20 + j * spacingY,
+                angle: Math.random() * Math.PI * 2,
+                friction: 0.3, // 足夠的摩擦力以維持剩磁
+                speed: 0.12
+            });
+        }
+    }
+}
+
+function updatePhysics() {
+    const magN_X = magnet.offsetLeft + 37.5, magN_Y = magnet.offsetTop + 35;
+    const magS_X = magnet.offsetLeft + 112.5, magS_Y = magnet.offsetTop + 35;
+
+    // 邊緣判定（判定為無外場）
+    const margin = 25;
+    const isAtEdge = (magnet.offsetLeft < margin || magnet.offsetLeft > stage.offsetWidth - magnet.offsetWidth - margin ||
+                      magnet.offsetTop < margin || magnet.offsetTop > stage.offsetHeight - magnet.offsetHeight - margin);
+
+    // 更新外場讀數 UI
+    const newHTML = isAtEdge ? "\\(\\vec{H} \\approx 0\\)" : "\\(\\vec{H}_{net}\\)";
+    if (hContainer.innerHTML !== newHTML) {
+        hContainer.innerHTML = newHTML;
+        if (window.MathJax) MathJax.typeset([hContainer]);
+    }
+
+    let mVectorX = 0; // 用於計算宏觀磁化強度 M
+    dipoles.forEach(d => {
+        if (!isAtEdge) {
+            let distN = Math.sqrt((d.x - magN_X)**2 + (d.y - magN_Y)**2);
+            let distS = Math.sqrt((d.x - magS_X)**2 + (d.y - magS_Y)**2);
+            
+            const power = 250000;
+            let bNx = (power / (distN**2)) * (d.x - magN_X) / distN;
+            let bNy = (power / (distN**2)) * (d.y - magN_Y) / distN;
+            let bSx = -(power / (distS**2)) * (d.x - magS_X) / distS;
+            let bSy = -(power / (distS**2)) * (d.y - magS_Y) / distS;
+
+            let totalBx = bNx + bSx, totalBy = bNy + bSy;
+            let totalB = Math.sqrt(totalBx**2 + totalBy**2);
+            let target = Math.atan2(totalBy, totalBx);
+
+            if (totalB > d.friction) {
+                let diff = target - d.angle;
+                while(diff > Math.PI) diff -= Math.PI * 2;
+                while(diff < -Math.PI) diff += Math.PI * 2;
+                d.angle += diff * d.speed;
+            }
+        }
+        mVectorX += Math.cos(d.angle);
+    });
+    
+    // 磁性狀態判定：即使 H=0，只要小箭頭整齊，就顯示剩磁
+    const mIntensity = Math.abs(mVectorX / dipoles.length);
+    if (mIntensity > 0.8) {
+        mText.innerText = "強磁飽和";
+        mText.style.color = "#ff4757";
+    } else if (mIntensity > 0.15) {
+        // 關鍵修正：若無外場但磁性仍強，標註為「剩磁」
+        mText.innerText = isAtEdge ? "保有剩磁" : "受感應磁化";
+        mText.style.color = "#ffa502";
+    } else {
+        mText.innerText = "無磁性";
+        mText.style.color = "#2ed573";
+    }
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // 材料外框
+    ctx.lineWidth = 4; ctx.strokeStyle = "#7f8c8d"; ctx.strokeRect(matX, matY, matW, matH);
+    // 繪製磁偶極
+    dipoles.forEach(d => {
+        ctx.save(); ctx.translate(d.x, d.y); ctx.rotate(d.angle);
+        ctx.beginPath(); ctx.lineWidth = 2; ctx.strokeStyle = "#2c3e50"; ctx.moveTo(-7, 0); ctx.lineTo(7, 0); ctx.stroke();
+        ctx.beginPath(); ctx.fillStyle = "#e74c3c"; ctx.moveTo(7, 0); ctx.lineTo(2, -4); ctx.lineTo(2, 4); ctx.fill();
+        ctx.restore();
+    });
+}
+
+function animate() { updatePhysics(); draw(); requestAnimationFrame(animate); }
+
+magnet.onmousedown = e => {
+    isDragging = true;
+    offsetX = e.clientX - magnet.offsetLeft; offsetY = e.clientY - magnet.offsetTop;
+};
+document.onmousemove = e => {
+    if (!isDragging) return;
+    let x = Math.max(0, Math.min(e.clientX - offsetX, stage.offsetWidth - 150));
+    let y = Math.max(0, Math.min(e.clientY - offsetY, stage.offsetHeight - 70));
+    magnet.style.left = x + 'px'; magnet.style.top = y + 'px';
+};
+document.onmouseup = () => isDragging = false;
+
+function degauss() {
+    dipoles.forEach(d => d.angle = Math.random() * Math.PI * 2);
+}
+
+init();
+animate();
+</script>
+</body>
+</html>
