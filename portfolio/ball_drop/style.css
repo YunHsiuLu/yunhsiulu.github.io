@@ -83,3 +83,36 @@ button {
 #resetBtn { background: #7f8c8d; color: white; }
 button:hover { opacity: 0.85; transform: translateY(-1px); }
 .hint { font-size: 0.8em; color: #888; margin-top: 10px; }
+/* 返回按鈕通用樣式 */
+.back-button {
+    display: flex;
+    align-items: center;
+    position: fixed; /* 固定位置 */
+    top: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #007bff; /* 藍色背景 */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    z-index: 1000; /* 確保在最上層 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
+}
+
+.back-button:hover {
+    background-color: #0056b3; /* 懸停時顏色加深 */
+}
+
+.arrow {
+    margin-right: 8px;
+    font-size: 20px;
+}
+
+/* 為了避免按鈕遮擋標題，建議為 body 或 h1 加上一點左邊距（可選） */
+h1, h2 {
+    margin-top: 10px;
+}
