@@ -2,19 +2,9 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>聲波干涉模擬 - 清潔版</title>
-    <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; background: #f0f0f0; color: #333; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        canvas { background: #fff; border: 1px solid #ccc; border-radius: 4px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .controls { background: #fff; padding: 20px; border-radius: 8px; margin-top: 20px; width: 600px; display: grid; grid-template-columns: 1fr 2fr 80px; gap: 15px; align-items: center; border: 1px solid #ddd; }
-        label { font-weight: bold; font-size: 14px; }
-        input[type="range"] { cursor: pointer; }
-        .value-display { text-align: right; font-family: monospace; font-weight: bold; color: #444; }
-        .legend { margin-top: 15px; display: flex; gap: 30px; font-size: 14px; }
-        .legend-item { display: flex; align-items: center; gap: 8px; }
-        .line-black { width: 30px; height: 2px; background: #000; }
-        .line-gray { width: 30px; height: 0px; border-top: 2px dashed #999; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -23,12 +13,12 @@
     <canvas id="canvas" width="800" height="500"></canvas>
 
     <div class="legend">
-        <div class="legend-item"><div class="line-black"></div> 腹線 (n&lambda;) - 黑色實線</div>
-        <div class="legend-item"><div class="line-gray"></div> 節線 ((n+0.5)&lambda;) - 灰色虛線</div>
+        <div class="legend-item"><div class="line-black"></div> 腹線 (nλ) - 黑色實線</div>
+        <div class="legend-item"><div class="line-gray"></div> 節線 ((n+0.5)λ) - 灰色虛線</div>
     </div>
 
     <div class="controls">
-        <label>波長 (&lambda;):</label>
+        <label>波長 (λ):</label>
         <input type="range" id="wavelength" min="15" max="120" value="45">
         <span class="value-display" id="wl-val">45</span>
 
@@ -37,113 +27,6 @@
         <span class="value-display" id="d-val">180</span>
     </div>
 
-<script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    const wlInput = document.getElementById('wavelength');
-    const dInput = document.getElementById('distance');
-    const wlVal = document.getElementById('wl-val');
-    const dVal = document.getElementById('d-val');
-
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const L = parseFloat(wlInput.value);
-        const D = parseFloat(dInput.value);
-        wlVal.innerText = L;
-        dVal.innerText = D;
-
-        const centerX = canvas.width / 2;
-        const centerY = canvas.height / 2;
-
-        const s1 = { x: centerX - D / 2, y: centerY };
-        const s2 = { x: centerX + D / 2, y: centerY };
-
-        // 繪製背景參考波紋 (淡淡的灰色，增加空間感)
-        drawWaveGuides(s1, s2, L);
-
-        const maxN = Math.floor(D / L) + 1;
-
-        for (let n = 0; n <= maxN; n++) {
-            // 腹線：黑色實線
-            drawHyperbola(s1, s2, n * L, '#000000', []);
-            
-            // 節線：灰色虛線
-            drawHyperbola(s1, s2, (n + 0.5) * L, '#999999', [6, 4]);
-        }
-
-        // 繪製波源點
-        ctx.fillStyle = '#000';
-        ctx.beginPath();
-        ctx.arc(s1.x, s1.y, 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(s2.x, s2.y, 4, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // 標註 S1, S2
-        ctx.font = "italic 12px Arial";
-        ctx.fillText("S1", s1.x - 10, s1.y - 10);
-        ctx.fillText("S2", s2.x - 10, s2.y - 10);
-    }
-
-    function drawHyperbola(s1, s2, diff, color, dash) {
-        if (diff < 0.1) { // 中央腹線
-            ctx.strokeStyle = color;
-            ctx.setLineDash(dash);
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo((s1.x + s2.x) / 2, 0);
-            ctx.lineTo((s1.x + s2.x) / 2, canvas.height);
-            ctx.stroke();
-            return;
-        }
-
-        const d = Math.abs(s1.x - s2.x);
-        if (diff >= d) return; 
-
-        ctx.strokeStyle = color;
-        ctx.setLineDash(dash);
-        ctx.lineWidth = 1.5;
-
-        const a = diff / 2;
-        const c = d / 2;
-        const b = Math.sqrt(c * c - a * a);
-
-        [-1, 1].forEach(side => {
-            ctx.beginPath();
-            let first = true;
-            for (let y = 0; y <= canvas.height; y += 2) {
-                const ty = y - canvas.height / 2;
-                const tx = side * a * Math.sqrt(1 + (ty * ty) / (b * b));
-                const x = tx + (canvas.width / 2);
-                
-                if (first) {
-                    ctx.moveTo(x, y);
-                    first = false;
-                } else {
-                    ctx.lineTo(x, y);
-                }
-            }
-            ctx.stroke();
-        });
-    }
-
-    function drawWaveGuides(s1, s2, L) {
-        ctx.globalAlpha = 0.05; // 極淡的參考線
-        ctx.strokeStyle = '#000';
-        ctx.setLineDash([]);
-        for (let r = L; r < 600; r += L) {
-            ctx.beginPath(); ctx.arc(s1.x, s1.y, r, 0, Math.PI * 2); ctx.stroke();
-            ctx.beginPath(); ctx.arc(s2.x, s2.y, r, 0, Math.PI * 2); ctx.stroke();
-        }
-        ctx.globalAlpha = 1.0;
-    }
-
-    wlInput.addEventListener('input', draw);
-    dInput.addEventListener('input', draw);
-    draw();
-</script>
-
+    <script src="script.js"></script>
 </body>
 </html>

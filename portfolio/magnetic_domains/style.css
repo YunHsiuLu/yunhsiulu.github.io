@@ -1,0 +1,139 @@
+:root {
+    --main-bg: #eaeff2;
+    --lab-bg: #ffffff;
+    --text-color: #2c3e50;
+    --accent: #e67e22;
+}
+
+body {
+    font-family: "PingFang TC", "Microsoft JhengHei", sans-serif;
+    background: var(--main-bg);
+    color: var(--text-color);
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    user-select: none;
+}
+
+h1 {
+    font-size: 2.2rem;
+    margin-bottom: 20px;
+    color: #1a1a1a;
+}
+
+.lab-bench {
+    display: flex;
+    gap: 30px;
+    background: var(--lab-bg);
+    padding: 35px;
+    border-radius: 25px;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.1);
+    width: 95%;
+    max-width: 1250px;
+}
+
+.stage-area {
+    flex: 1.8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.stage {
+    position: relative;
+    border: 4px solid #7f8c8d;
+    border-radius: 20px;
+    background: #fff;
+    width: 850px;
+    height: 550px;
+    overflow: hidden;
+    cursor: crosshair;
+}
+
+#domainCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#magnet {
+    position: absolute;
+    width: 150px;
+    height: 70px;
+    background: linear-gradient(to right, #e74c3c 50%, #3498db 50%);
+    border-radius: 10px;
+    color: white;
+    line-height: 70px;
+    font-weight: bold;
+    font-size: 1.4rem;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    z-index: 10;
+    cursor: move;
+}
+
+.controls {
+    flex: 0 0 350px;
+    padding: 25px;
+    background: #fdfdfd;
+    border-radius: 20px;
+    border: 2px solid #e0e6ed;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.section-label {
+    font-size: 1.4rem;
+    font-weight: 800;
+    border-left: 6px solid var(--accent);
+    padding-left: 15px;
+    margin-bottom: 12px;
+}
+
+button {
+    font-size: 1.3rem;
+    padding: 18px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+    box-shadow: 0 5px 0 #b35d10;
+}
+
+button:hover {
+    background: #d35400;
+    transform: translateY(-2px);
+}
+
+button:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+.readout-box {
+    font-family: inherit;
+    font-size: 1.2rem;
+    color: #ffffff;
+    background: #2c3e50;
+    padding: 5px 12px;
+    border-radius: 8px;
+    display: inline-block;
+    min-width: 120px;
+    text-align: center;
+}
+
+.info-box {
+    font-size: 1rem;
+    color: #636e72;
+    background: #f1f2f6;
+    padding: 15px;
+    border-radius: 10px;
+    line-height: 1.5;
+}
