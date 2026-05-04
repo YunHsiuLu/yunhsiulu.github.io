@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>物理模擬：水波干涉（腹線與節線）</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/auto-render.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html#BALL" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+    <div class="container">
+        <div class="simulation-box">
+            <h3>雙點波源干涉模擬 (左右排列)</h3>
+            <canvas id="simCanvas"></canvas>
+            <div class="controls">
+                <button id="playBtn">暫停/播放</button>
+                <button id="resetBtn">重置實驗</button>
+            </div>
+            <p class="hint">提示：固定波速 $v$，調整頻率 $f$。實線為腹線，虛線為節線。</p>
+        </div>
+
+        <div class="energy-panel">
+            <h3>干涉參數面板</h3>
+            <div class="stats">
+                <div class="stat-item"><span class="label">頻率 ($f$)</span><br><span id="fVal">0.05</span> Hz</div>
+                <div class="stat-item"><span class="label">間距 ($d$)</span><br><span id="distVal">120</span> px</div>
+                <div class="stat-item"><span class="label">波速 ($v$)</span><br><span>1.50</span></div>
+            </div>
+            
+            <div class="settings" id="math-settings">
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="label">波源頻率 ($f$): <strong id="fDisplay">0.05</strong></span>
+                    </div>
+                    <input type="range" id="fSlider" min="0.02" max="0.10" step="0.01" value="0.05">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="label">波源間距 ($d$): <strong id="dDisplay">120</strong></span>
+                    </div>
+                    <input type="range" id="dSlider" min="40" max="300" step="10" value="120">
+                </div>
+
+                <div class="slider-group">
+                    <div class="slider-header">
+                        <span class="label">相位關係: <strong id="phaseDisplay">同相 (0)</strong></span>
+                    </div>
+                    <input type="range" id="phaseSlider" min="0" max="1" step="1" value="0">
+                    <div class="slider-labels">
+                        <span>同相 (0)</span>
+                        <span>反相 ($\pi$)</span>
+                    </div>
+                </div>
+
+                <div class="slider-group">
+                    <label><input type="checkbox" id="showLines" checked> 顯示幾何腹線/節線</label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
