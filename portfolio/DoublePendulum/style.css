@@ -1,0 +1,158 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 8px 12px;
+    font-size: 20px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.back-button:hover {
+    background-color: #0056b3;
+}
+
+.main-layout {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* 左側邊欄 */
+.sidebar {
+    width: 260px; /* 稍微縮窄左側，讓右側可以大一點 */
+    background: white;
+    padding: 80px 20px 20px 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 10;
+    overflow-y: auto;
+    flex-shrink: 0;
+}
+
+.sidebar h1 { margin: 0; font-size: 22px; color: #222; }
+.formula { font-style: italic; color: #666; font-weight: bold; font-size: 16px; margin: -5px 0 0 0; }
+.sub-formula { font-size: 14px; color: #888; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+
+.control-group { margin-bottom: 10px; }
+.control-group h3 { font-size: 14px; margin: 0 0 5px 0; color: #555; }
+
+.input-wrapper { display: flex; align-items: center; gap: 10px; }
+input[type="number"] { flex: 1; padding: 6px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; outline: none; }
+input[type="number"]:focus { border-color: #007bff; }
+.unit-label { font-size: 14px; color: #555; font-weight: bold; }
+
+.button-group { display: flex; gap: 10px; margin-top: 10px; }
+button { flex: 1; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+button:hover { background-color: #218838; }
+button.secondary { background-color: #6c757d; }
+button.secondary:hover { background-color: #5a6268; }
+.info-text { font-size: 12px; color: #777; margin-top: 10px; }
+
+/* 中間模擬區 */
+.simulation-area {
+    flex: 1; /* 自動填滿剩餘空間 */
+    position: relative;
+    background-color: #eef2f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#simCanvas {
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    background-color: #fff;
+    border-radius: 4px;
+}
+
+.trace-toggle {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    font-size: 12px;
+    background: rgba(255,255,255,0.8);
+    padding: 5px;
+    border-radius: 4px;
+}
+
+/* 右側數據面板 */
+.data-panel {
+    width: 480px; /* 加寬右側，這樣中間就會變窄 */
+    background: #fff;
+    border-left: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    z-index: 5;
+    height: 100vh;
+}
+
+/* 上半部：能量圖 */
+.top-section {
+    height: 40%;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* 下半部：兩個相圖 */
+.phase-container {
+    height: 60%;
+    display: flex;
+    flex-direction: column;
+}
+
+.small-chart {
+    flex: 1; /* 兩個相圖各佔一半 */
+    padding: 5px 10px;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    border-bottom: 1px solid #eee;
+}
+
+.chart-section h3 {
+    margin: 0 0 5px 0;
+    font-size: 13px;
+    text-align: center;
+    color: #444;
+}
+
+.chart-controls, .range-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 5px;
+    font-size: 11px;
+}
+
+.canvas-wrapper {
+    flex: 1;
+    position: relative;
+    width: 100%;
+    min-height: 0;
+}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Double Pendulum Simulation</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <a href="../index.html" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+
+    <div class="main-layout">
+        <!-- 左側：控制區 -->
+        <div class="sidebar">
+            <h1>Double Pendulum</h1>
+            <p class="formula">Chaotic Motion</p>
+            <p class="sub-formula">L<sub>1</sub> = L<sub>2</sub></p>
+
+            <div class="controls-container">
+                <!-- 角度 1 輸入 -->
+                <div class="control-group">
+                    <h3>Angle 1 (&theta;<sub>1</sub>)</h3>
+                    <div class="input-wrapper">
+                        <input type="number" id="theta1" value="90" step="1">
+                        <span class="unit-label">&deg;</span>
+                    </div>
+                </div>
+                <!-- 角度 2 輸入 -->
+                <div class="control-group">
+                    <h3>Angle 2 (&theta;<sub>2</sub>)</h3>
+                    <div class="input-wrapper">
+                        <input type="number" id="theta2" value="90" step="1">
+                        <span class="unit-label">&deg;</span>
+                    </div>
+                </div>
+
+                <!-- 按鈕 -->
+                <div class="button-group">
+                    <button id="btn-start">Start / Pause</button>
+                    <button id="btn-reset" class="secondary">Reset</button>
+                </div>
+
+                <div class="info-text">
+                    <p>Enter angles to set initial state.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中間：動畫區 -->
+        <div class="simulation-area">
+            <canvas id="simCanvas"></canvas>
+            <div class="trace-toggle">
+                <label><input type="checkbox" id="show-trace" checked> Show Trace</label>
+            </div>
+        </div>
+
+        <!-- 右側：數據圖表區 -->
+        <div class="data-panel">
+            
+            <!-- 1. 能量圖 (佔據上半部) -->
+            <div class="chart-section top-section">
+                <h3>Energy vs Time</h3>
+                
+                <!-- 顯示控制 Checkbox -->
+                <div class="chart-controls">
+                    <label><input type="checkbox" data-set="0" checked> Total E1</label>
+                    <label><input type="checkbox" data-set="1" checked> Total E2</label>
+                    <label><input type="checkbox" data-set="2"> KE1</label>
+                    <label><input type="checkbox" data-set="3"> PE1</label>
+                    <label><input type="checkbox" data-set="4"> KE2</label>
+                    <label><input type="checkbox" data-set="5"> PE2</label>
+                </div>
+
+                <!-- 時間範圍控制 Radio -->
+                <div class="range-controls">
+                    <span>View: </span>
+                    <label><input type="radio" name="time-range" value="recent" checked> Recent</label>
+                    <label><input type="radio" name="time-range" value="all"> All History</label>
+                </div>
+
+                <div class="canvas-wrapper">
+                    <canvas id="energyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 2. 相圖 (佔據下半部，並分為兩塊) -->
+            <div class="phase-container">
+                <!-- Pendulum 1 Phase -->
+                <div class="chart-section small-chart">
+                    <h3>Phase Space: Pendulum 1</h3>
+                    <div class="canvas-wrapper">
+                        <canvas id="phaseChart1"></canvas>
+                    </div>
+                </div>
+                <!-- Pendulum 2 Phase -->
+                <div class="chart-section small-chart">
+                    <h3>Phase Space: Pendulum 2</h3>
+                    <div class="canvas-wrapper">
+                        <canvas id="phaseChart2"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
