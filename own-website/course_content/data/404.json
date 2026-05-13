@@ -126,7 +126,7 @@
       "date": "04/28",
       "weekday": "週二",
       "period": "15:00-16:00",
-      "content": "4-2"
+      "content": "4-2~4-3"
     },
     {
       "date": "05/01",
@@ -138,7 +138,7 @@
       "date": "05/05",
       "weekday": "週二",
       "period": "15:00-16:00",
-      "content": "4-2~4-3"
+      "content": "4-3~4-4"
     },
     {
       "date": "05/08",
@@ -150,67 +150,67 @@
       "date": "05/12",
       "weekday": "週二",
       "period": "15:00-16:00",
-      "content": "4-4~4-5"
+      "content": "小考4"
     },
     {
       "date": "05/15",
       "weekday": "週五",
       "period": "13:00-14:00",
-      "content": "檢討考卷、5-1"
+      "content": "檢討考卷、4-5"
     },
     {
       "date": "05/19",
       "weekday": "週二",
       "period": "15:00-16:00",
-      "content": "5-1"
+      "content": "4-5~5-1"
     },
     {
       "date": "05/22",
       "weekday": "週五",
       "period": "13:00-14:00",
-      "content": "5-2"
+      "content": "5-1"
     },
     {
       "date": "05/26",
       "weekday": "週二",
       "period": "15:00-16:00",
-      "content": "小考5-1、5-2"
+      "content": "5-2"
     },
     {
       "date": "05/29",
       "weekday": "週五",
       "period": "13:00-14:00",
-      "content": "5-3~5-4"
+      "content": "5-2~5-3"
     },
     {
       "date": "06/02",
       "weekday": "週二",
       "period": "15:00-16:00",
-      "content": "小考5-3、5-4"
+      "content": "5-3"
     },
     {
       "date": "06/05",
       "weekday": "週五",
       "period": "13:00-14:00",
-      "content": "6-1"
+      "content": "5-3~5-4"
     },
     {
       "date": "06/09",
       "weekday": "週二",
       "period": "15:00-16:00",
-      "content": "6-1"
+      "content": "5-4~6-1"
     },
     {
       "date": "06/12",
       "weekday": "週五",
       "period": "13:00-14:00",
-      "content": "小考6-1"
+      "content": "6-1~6-2"
     },
     {
       "date": "06/16",
       "weekday": "週二",
       "period": "15:00-16:00",
-      "content": "6-2~6-4"
+      "content": "6-3~6-4"
     },
     {
       "date": "06/19",
@@ -222,7 +222,7 @@
       "date": "06/23",
       "weekday": "週二",
       "period": "15:00-16:00",
-      "content": "小考6-2~6-4"
+      "content": "小考全範圍"
     },
     {
       "date": "06/26",

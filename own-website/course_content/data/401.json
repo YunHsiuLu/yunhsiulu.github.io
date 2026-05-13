@@ -144,13 +144,13 @@
       "date": "05/06",
       "weekday": "週三",
       "period": "10:00-11:00",
-      "content": ""
+      "content": "4-4"
     },
     {
       "date": "05/07",
       "weekday": "週四",
       "period": "09:00-10:00",
-      "content": ""
+      "content": "小考4"
     },
     {
       "date": "05/13",
@@ -168,73 +168,73 @@
       "date": "05/20",
       "weekday": "週三",
       "period": "10:00-11:00",
-      "content": "檢討考卷、5-1"
+      "content": "檢討考卷、4-5"
     },
     {
       "date": "05/21",
       "weekday": "週四",
       "period": "09:00-10:00",
-      "content": "5-1"
+      "content": "4-5~5-1"
     },
     {
       "date": "05/27",
       "weekday": "週三",
       "period": "10:00-11:00",
-      "content": "5-2"
+      "content": "5-1"
     },
     {
       "date": "05/28",
       "weekday": "週四",
       "period": "09:00-10:00",
-      "content": "小考5-1、5-2"
+      "content": "5-2"
     },
     {
       "date": "06/03",
       "weekday": "週三",
       "period": "10:00-11:00",
-      "content": "5-3~5-4"
+      "content": "5-2"
     },
     {
       "date": "06/04",
       "weekday": "週四",
       "period": "09:00-10:00",
-      "content": "小考5-3、5-4"
+      "content": "5-3"
     },
     {
       "date": "06/10",
       "weekday": "週三",
       "period": "10:00-11:00",
-      "content": "6-1"
+      "content": "5-3"
     },
     {
       "date": "06/11",
       "weekday": "週四",
       "period": "09:00-10:00",
-      "content": "6-1"
+      "content": "5-4"
     },
     {
       "date": "06/17",
       "weekday": "週三",
       "period": "10:00-11:00",
-      "content": "小考6-1"
+      "content": "6-1"
     },
     {
       "date": "06/18",
       "weekday": "週四",
       "period": "09:00-10:00",
-      "content": "6-2~6-4"
+      "content": "6-2~6-3"
     },
     {
       "date": "06/24",
       "weekday": "週三",
       "period": "10:00-11:00",
-      "content": "小考6-2~6-4"
+      "content": "6-4"
     },
     {
       "date": "06/25",
       "weekday": "週四",
       "period": "09:00-10:00",
-      "content": "檢討考卷、自習、問問題"
+      "content": "小考全範圍"
     }
   ]
 }
