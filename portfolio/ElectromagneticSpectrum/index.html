@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>電磁波頻譜互動分析</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="../index.html#SPEC" class="back-button">
+        <span class="arrow">←</span>
+    </a>
+
+    <div class="container">
+        <div class="simulation-box">
+            <h3>電磁波頻譜示意圖 (Electromagnetic Spectrum)</h3>
+            <canvas id="simCanvas"></canvas>
+            <p class="hint">操作提示：點擊圖中文字標籤，右側面板將顯示該波段的詳細物理參數。</p>
+        </div>
+
+        <div class="energy-panel">
+            <h3>即時物理參數分析</h3>
+            <div class="stats">
+                <div class="stat-item"><span class="label">波長 (λ)</span><br><span id="wlVal">-</span> m</div>
+                <div class="stat-item"><span class="label">頻率 (f)</span><br><span id="freqVal">-</span> Hz</div>
+                <div class="stat-item"><span class="label">能量 (E)</span><br><span id="eVal">-</span> eV</div>
+            </div>
+            
+            <div class="settings">
+                <div id="descriptionBox">
+                    <p style="color: #666;">請點擊左側波段名稱以獲取該電磁波的詳細敘述與應用資訊。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
