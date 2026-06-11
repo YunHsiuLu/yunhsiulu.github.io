@@ -228,7 +228,7 @@
       "date": "06/11",
       "weekday": "週四",
       "period": "13:00-14:00",
-      "content": "5-4"
+      "content": "5-4~6-1"
     },
     {
       "date": "06/17",
@@ -240,19 +240,19 @@
       "date": "06/18",
       "weekday": "週四",
       "period": "13:00-14:00",
-      "content": "6-2~6-3"
+      "content": "6-2~6-4"
     },
     {
       "date": "06/24",
       "weekday": "週三",
       "period": "11:00-12:00",
-      "content": "6-4"
+      "content": "小考6"
     },
     {
       "date": "06/25",
       "weekday": "週四",
       "period": "13:00-14:00",
-      "content": "小考全範圍"
+      "content": "自習"
     }
   ]
 }
