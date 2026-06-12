@@ -129,7 +129,7 @@ class Satellite {
         this.rel_z += this.rel_vz * dt;
         
         this.x = this.parent.x + this.rel_x;
-        this.y = self.parent.y + this.rel_y; 
+        this.y = this.parent.y + this.rel_y;
     }
 }
 
