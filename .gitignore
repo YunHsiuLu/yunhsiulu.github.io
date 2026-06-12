@@ -1,2 +1,8 @@
 .DS_Store
 
+# Python virtual environments are machine-specific and must not be deployed.
+portfolio/solar/bin/
+portfolio/solar/include/
+portfolio/solar/lib/
+portfolio/solar/share/
+portfolio/solar/pyvenv.cfg
