@@ -1,0 +1,8 @@
+:root { --lab-cyan:#23bfd0; --lab-navy:#07111f; }
+.lab-toolbar { position:fixed; top:16px; right:16px; z-index:10000; display:flex; gap:6px; padding:6px; border:1px solid rgba(111,148,174,.38); border-radius:10px; background:rgba(7,17,31,.88); box-shadow:0 8px 28px rgba(0,0,0,.24); backdrop-filter:blur(12px); }
+.lab-toolbar a,.lab-toolbar button { box-sizing:border-box; display:grid; place-items:center; width:38px; height:38px; min-width:38px; margin:0; padding:0; color:#eaf7ff; border:0; border-radius:6px; background:transparent; cursor:pointer; font:500 20px/1 system-ui,sans-serif; text-decoration:none; transition:background .18s,color .18s; }
+.lab-toolbar a:hover,.lab-toolbar button:hover,.lab-toolbar a:focus-visible,.lab-toolbar button:focus-visible { color:var(--lab-navy); background:var(--lab-cyan); outline:0; }
+.lab-toolbar .lab-label { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+.lab-shortcut { position:fixed; right:16px; bottom:16px; z-index:9999; padding:7px 10px; color:#8aa2b6; border:1px solid rgba(111,148,174,.25); border-radius:6px; background:rgba(7,17,31,.76); font:500 11px/1.3 system-ui,sans-serif; pointer-events:none; backdrop-filter:blur(8px); }
+@media (max-width:700px) { .lab-toolbar { top:8px; right:8px; }.lab-toolbar a,.lab-toolbar button { width:34px; height:34px; min-width:34px; }.lab-shortcut { display:none; } }
+@media print { .lab-toolbar,.lab-shortcut { display:none!important; } }

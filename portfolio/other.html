@@ -1,54 +1,40 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>其他補充資料</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>補充資源｜物理互動實驗室</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <a href="index.html" class="back-button">
-        <span class="arrow">←</span>
-    </a>
-    <div class="gallery">
-        <div class="gallery-item">
-            <a href="https://www.geogebra.org/calculator/awgrpex7" target="_blank">
-                <img src="Convex_Image_Geogebra.png">
-                <p>Use Geogebra to present the Convex Imaging.</p>
-            </a>
-        </div>
-        <div class="gallery-item">
-            <a href="https://www.geogebra.org/calculator/ykdmn6xt" target="_blank">
-                <img src="Concave_Image_Geogebra.png">
-                <p>Use Geogebra to present the Concave Imaging.</p>
-            </a>
-        </div>
-        <div class="gallery-item">
-            <a href="https://javalab.org/en/double_slit_en/" target="_blank">
-                <img src="Double_Slit_Experiment1.png">
-                <p>Use JavaLab to simulate the double slit experiment, 3D graph (From JavaLab open source).</p>
-            </a>
-        </div>
-        <div class="gallery-item">
-            <a href="https://javalab.org/en/youngs_double_slit_en/" target="_blank">
-                <img src="Double_Slit_Experiment2.png">
-                <p>Use JavaLab to simulate the double slit experiment, 2D graph (From JavaLab open source).</p>
-            </a>
-        </div>
-        <div class="gallery-item" id="SQL">
-            <a href="./MySQLtutorial/index.html">
-                <img src="./MySQLtutorial/preview.png">
-                <p>MySQL tutorial</p>
-            </a>
-        </div>
-        <div class="gallery-item">
-            <a href="./election.html">
-                <img src="./election.png">
-                <p>Briefly explain how election works</p>
-            </a>
-        </div>
-        <!-- 更多作品可以在這裡加入 -->
-    </div>
+  <a href="../index.html" class="back-button" aria-label="返回個人首頁">
+    <span class="arrow" aria-hidden="true">←</span>
+  </a>
+  <header class="site-header">
+    <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">φ</span><span><strong>物理互動實驗室</strong><small>PHYSICS LAB</small></span></a>
+    <nav aria-label="主要導覽"><a href="index.html#simulations">探索模擬</a><a href="other.html" aria-current="page">補充資源</a></nav>
+  </header>
+
+  <main class="resource-page">
+    <section class="resource-intro">
+      <p class="eyebrow">TEACHING RESOURCES</p>
+      <h1>補充教材與<br><span>跨領域工具。</span></h1>
+      <p>彙整適合延伸課堂討論的外部模擬、資訊教材與公民議題工具。</p>
+      <a class="primary-action" href="index.html">← 回模擬首頁</a>
+    </section>
+    <section class="catalog resources" aria-labelledby="resources-title">
+      <div class="section-heading"><div><p class="eyebrow">RESOURCE COLLECTION</p><h2 id="resources-title">資源列表</h2></div></div>
+      <div class="gallery">
+        <article class="card"><a href="https://www.geogebra.org/calculator/awgrpex7" target="_blank" rel="noopener"><div class="thumb"><img src="Convex_Image_Geogebra.png" alt="GeoGebra 凸透鏡成像教材"><span class="tag">GeoGebra</span></div><div class="card-copy"><h3>凸透鏡成像</h3><p>透過 GeoGebra 動態呈現凸透鏡的主光線與成像。</p><span class="launch">前往外部資源 ↗</span></div></a></article>
+        <article class="card"><a href="https://www.geogebra.org/calculator/ykdmn6xt" target="_blank" rel="noopener"><div class="thumb"><img src="Concave_Image_Geogebra.png" alt="GeoGebra 凹透鏡成像教材"><span class="tag">GeoGebra</span></div><div class="card-copy"><h3>凹透鏡成像</h3><p>調整物體位置，觀察凹透鏡虛像的位置與大小。</p><span class="launch">前往外部資源 ↗</span></div></a></article>
+        <article class="card"><a href="https://javalab.org/en/double_slit_en/" target="_blank" rel="noopener"><div class="thumb"><img src="Double_Slit_Experiment1.png" alt="JavaLab 三維雙狹縫實驗"><span class="tag">JavaLab</span></div><div class="card-copy"><h3>雙狹縫實驗・3D</h3><p>以三維視角連結波前傳播與干涉條紋。</p><span class="launch">前往外部資源 ↗</span></div></a></article>
+        <article class="card"><a href="https://javalab.org/en/youngs_double_slit_en/" target="_blank" rel="noopener"><div class="thumb"><img src="Double_Slit_Experiment2.png" alt="JavaLab 二維雙狹縫實驗"><span class="tag">JavaLab</span></div><div class="card-copy"><h3>楊氏雙狹縫・2D</h3><p>用二維模型比較路徑差與亮暗紋位置。</p><span class="launch">前往外部資源 ↗</span></div></a></article>
+        <article class="card"><a href="MySQLtutorial/index.html"><div class="thumb"><img src="MySQLtutorial/preview.png" alt="MySQL 入門教材"><span class="tag">資訊</span></div><div class="card-copy"><h3>MySQL 入門教材</h3><p>兩份資料庫課程講義，從基礎語法開始練習。</p><span class="launch">查看教材 ↗</span></div></a></article>
+        <article class="card"><a href="election.html"><div class="thumb"><img src="election.png" alt="選舉制度模擬工具"><span class="tag">公民 × 數學</span></div><div class="card-copy"><h3>選舉制度模擬</h3><p>調整選民分布與票數，理解制度如何影響結果。</p><span class="launch">開啟工具 ↗</span></div></a></article>
+      </div>
+    </section>
+  </main>
+  <footer><p>呂昀修・新竹市立建功高中</p><p>補充資源的著作權屬原作者所有。</p></footer>
 </body>
 </html>
-
