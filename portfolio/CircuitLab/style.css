@@ -220,6 +220,24 @@ h2 {
   stroke: var(--accent);
 }
 
+.wire-preview {
+  stroke: var(--accent);
+  stroke-dasharray: 10 8;
+  opacity: 0.72;
+  pointer-events: none;
+}
+
+.wire-bend {
+  fill: var(--panel);
+  stroke: var(--accent);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.wire-bend.is-draft {
+  fill: var(--accent);
+}
+
 .component-body {
   fill: var(--panel);
   stroke: #2c3a47;

@@ -52,6 +52,7 @@ const state = {
   wires: [],
   selected: null,
   wireStart: null,
+  wireDraft: null,
   nextId: 1,
   traces: [],
 };
@@ -98,13 +99,18 @@ function formatEngineering(value) {
 function setMode(mode) {
   state.mode = mode;
   state.wireStart = null;
+  state.wireDraft = null;
   document.querySelectorAll("button[data-tool], #wireBtn, #selectBtn").forEach((button) => {
     button.classList.toggle("is-active", button.dataset.tool === mode || button.id === `${mode}Btn`);
   });
   const text = mode === "wire" ? "導線模式" : mode === "select" ? "選取模式" : `放置 ${labels[mode]}`;
   ui.modeText.textContent = text;
   ui.messageText.textContent =
-    mode === "wire" ? "點選兩個端點建立導線。" : mode === "select" ? "拖曳零件可移動，選取後可改值。" : "在格線上點一下放置零件。";
+    mode === "wire"
+      ? "點端點開始拉線；點格線加入直角折點；點另一端點完成。"
+      : mode === "select"
+        ? "拖曳零件可移動，選取後可改值。"
+        : "在格線上點一下放置零件。";
   render();
 }
 
@@ -168,16 +174,71 @@ function findTerminal(point) {
   return null;
 }
 
-function addWire(from, to) {
+function pointsEqual(a, b) {
+  return a && b && a.x === b.x && a.y === b.y;
+}
+
+function compactRoute(points) {
+  const withoutDuplicates = [];
+  for (const point of points) {
+    if (!pointsEqual(withoutDuplicates.at(-1), point)) withoutDuplicates.push(point);
+  }
+  const compacted = [];
+  for (const point of withoutDuplicates) {
+    const prev = compacted.at(-1);
+    const prevPrev = compacted.at(-2);
+    const isCollinear = prevPrev && prev && ((prevPrev.x === prev.x && prev.x === point.x) || (prevPrev.y === prev.y && prev.y === point.y));
+    if (isCollinear) compacted[compacted.length - 1] = point;
+    else compacted.push(point);
+  }
+  return compacted;
+}
+
+function buildOrthogonalRoute(start, bends, end) {
+  const route = [start];
+  for (const target of [...bends, end]) {
+    const current = route.at(-1);
+    if (!current) continue;
+    if (current.x !== target.x && current.y !== target.y) route.push({ x: target.x, y: current.y });
+    route.push(target);
+  }
+  return compactRoute(route);
+}
+
+function routeToPath(route) {
+  if (!route.length) return "";
+  const [first, ...rest] = route;
+  return `M ${first.x} ${first.y} ${rest.map((point) => `L ${point.x} ${point.y}`).join(" ")}`;
+}
+
+function routeForWire(wire) {
+  const from = terminalById(wire.from);
+  const to = terminalById(wire.to);
+  if (!from || !to) return [];
+  return buildOrthogonalRoute(from, wire.points || [], to);
+}
+
+function draftRoute() {
+  if (!state.wireDraft?.preview) return [];
+  return buildOrthogonalRoute(state.wireDraft.from, state.wireDraft.points, state.wireDraft.preview);
+}
+
+function addWire(from, to, points = []) {
   if (!from || !to || from.id === to.id) return;
-  const exists = state.wires.some((wire) => {
+  const existing = state.wires.find((wire) => {
     return (wire.from === from.id && wire.to === to.id) || (wire.from === to.id && wire.to === from.id);
   });
-  if (!exists) {
-    state.wires.push({ id: `w${state.nextId++}`, from: from.id, to: to.id });
+  let selectedWireId = existing?.id;
+  if (!existing) {
+    const route = buildOrthogonalRoute(from, points, to);
+    const bendPoints = compactRoute(route.slice(1, -1));
+    const wire = { id: `w${state.nextId++}`, from: from.id, to: to.id, points: bendPoints };
+    state.wires.push(wire);
+    selectedWireId = wire.id;
   }
   state.wireStart = null;
-  selectItem({ kind: "wire", id: state.wires[state.wires.length - 1].id });
+  state.wireDraft = null;
+  selectItem({ kind: "wire", id: selectedWireId });
 }
 
 function selectItem(item) {
@@ -199,16 +260,16 @@ function selectedWire() {
 function render() {
   svg.replaceChildren();
   renderWires();
+  renderWireDraft();
   renderComponents();
 }
 
 function renderWires() {
   for (const wire of state.wires) {
-    const from = terminalById(wire.from);
-    const to = terminalById(wire.to);
-    if (!from || !to) continue;
+    const route = routeForWire(wire);
+    if (!route.length) continue;
     const path = createSvgElement("path", {
-      d: `M ${from.x} ${from.y} L ${to.x} ${to.y}`,
+      d: routeToPath(route),
       class: `wire-path ${state.selected?.id === wire.id ? "is-selected" : ""}`,
       "data-wire": wire.id,
     });
@@ -217,6 +278,25 @@ function renderWires() {
       selectItem({ kind: "wire", id: wire.id });
     });
     svg.append(path);
+
+    if (state.selected?.id === wire.id) {
+      for (const point of wire.points || []) {
+        svg.append(createSvgElement("circle", { cx: point.x, cy: point.y, r: 5, class: "wire-bend" }));
+      }
+    }
+  }
+}
+
+function renderWireDraft() {
+  const route = draftRoute();
+  if (route.length < 2) return;
+  const path = createSvgElement("path", {
+    d: routeToPath(route),
+    class: "wire-path wire-preview",
+  });
+  svg.append(path);
+  for (const point of state.wireDraft.points) {
+    svg.append(createSvgElement("circle", { cx: point.x, cy: point.y, r: 5, class: "wire-bend is-draft" }));
   }
 }
 
@@ -327,14 +407,31 @@ function handleTerminalClick(terminal) {
     selectItem({ kind: "component", id: terminal.component.id });
     return;
   }
-  if (!state.wireStart) {
+  if (!state.wireDraft) {
     state.wireStart = terminal;
-    ui.messageText.textContent = "已選取第一個端點，請點第二個端點。";
+    state.wireDraft = { from: terminal, points: [], preview: terminal };
+    ui.messageText.textContent = "已選取第一個端點；可點格線加入折點，或點另一端點完成。";
     render();
     return;
   }
-  addWire(state.wireStart, terminal);
+  if (state.wireDraft.from.id === terminal.id) {
+    ui.messageText.textContent = "起點與終點相同；請點另一個端點完成導線，或按 Esc 取消。";
+    return;
+  }
+  addWire(state.wireDraft.from, terminal, state.wireDraft.points);
   ui.messageText.textContent = "導線已建立。";
+  render();
+}
+
+function addWireBend(point) {
+  if (!state.wireDraft) {
+    ui.messageText.textContent = "請先點選一個端點開始拉導線。";
+    return;
+  }
+  const last = state.wireDraft.points.at(-1) || state.wireDraft.from;
+  if (!pointsEqual(last, point)) state.wireDraft.points.push(point);
+  state.wireDraft.preview = point;
+  ui.messageText.textContent = "已加入折點；可繼續點格線延伸，或點端點完成。";
   render();
 }
 
@@ -370,6 +467,9 @@ function renderProperties() {
     const title = document.createElement("p");
     title.textContent = `導線：${wire.id}`;
     ui.propertyPanel.append(title);
+    const detail = document.createElement("p");
+    detail.textContent = `直角折點：${(wire.points || []).length} 個`;
+    ui.propertyPanel.append(detail);
   } else {
     const text = document.createElement("p");
     text.textContent = "選取零件或導線端點後可調整數值。";
@@ -434,6 +534,7 @@ function clearAll() {
   state.wires = [];
   state.selected = null;
   state.wireStart = null;
+  state.wireDraft = null;
   renderProperties();
   state.traces = [];
   drawScope([]);
@@ -738,10 +839,17 @@ svg.addEventListener("pointerdown", (event) => {
   } else if (state.mode === "wire") {
     const terminal = findTerminal(point);
     if (terminal) handleTerminalClick(terminal);
+    else addWireBend(point);
   } else {
     addComponent(state.mode, point.x, point.y);
     setMode("select");
   }
+});
+
+svg.addEventListener("pointermove", (event) => {
+  if (state.mode !== "wire" || !state.wireDraft) return;
+  state.wireDraft.preview = getBoardPoint(event);
+  render();
 });
 
 document.addEventListener("keydown", (event) => {
