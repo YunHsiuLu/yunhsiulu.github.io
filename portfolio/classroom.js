@@ -1,6 +1,5 @@
 (() => {
   if (document.querySelector('.lab-toolbar')) return;
-  const fromPortfolioIndex = document.referrer && new URL(document.referrer).pathname.endsWith('/portfolio/index.html');
 
   const toolbar = document.createElement('nav');
   toolbar.className = 'lab-toolbar';
@@ -13,17 +12,6 @@
   hint.className = 'lab-shortcut';
   hint.textContent = 'F：全螢幕　Esc：離開';
   document.body.append(toolbar, hint);
-
-  function smartReturn(event) {
-    if (!fromPortfolioIndex || history.length <= 1) return;
-    event.preventDefault();
-    history.back();
-  }
-
-  document.querySelectorAll('a.back-button').forEach((button) => {
-    button.addEventListener('click', smartReturn);
-  });
-  toolbar.querySelector('a').addEventListener('click', smartReturn);
 
   async function toggleFullscreen() {
     try {

@@ -11,10 +11,57 @@
     <a href="../index.html" class="back-button">
         <span class="arrow">←</span>
     </a>
-    <h1>Water Wave Simulation</h1>
-    <canvas id="waveCanvas"></canvas>
+    <main class="sim-page">
+        <section class="intro">
+            <p class="eyebrow">WATER WAVE PARTICLE MOTION</p>
+            <h1>水波中的質點運動</h1>
+            <p>行進中的水波不只是上下振動；在這個簡化模型中，水面質點會沿著近似圓形軌跡運動。暫停或放慢動畫，可以觀察位置、軌跡與瞬時速度方向的關係。</p>
+        </section>
+
+        <section class="stage">
+            <canvas id="waveCanvas" width="1000" height="520" aria-label="水波質點運動模擬"></canvas>
+        </section>
+
+        <section class="controls" aria-label="水波模擬控制">
+            <button id="togglePlay" type="button">暫停</button>
+            <button id="stepFrame" type="button">單步</button>
+            <label>
+                速度倍率
+                <input id="speedSlider" type="range" min="0.1" max="2.5" step="0.1" value="1">
+                <output id="speedValue">1.0×</output>
+            </label>
+            <label>
+                振幅
+                <input id="amplitudeSlider" type="range" min="15" max="70" step="1" value="42">
+                <output id="amplitudeValue">42</output>
+            </label>
+            <label class="check">
+                <input id="showArrows" type="checkbox" checked>
+                顯示速度方向箭頭
+            </label>
+            <label class="check">
+                <input id="showPath" type="checkbox" checked>
+                顯示紅色質點軌跡
+            </label>
+            <label class="check">
+                <input id="showOrbit" type="checkbox" checked>
+                顯示圓周軌道
+            </label>
+            <label class="check">
+                <input id="showComponents" type="checkbox" checked>
+                顯示水平／垂直分量
+            </label>
+        </section>
+
+        <section class="legend" aria-label="圖例">
+            <span><i class="dot blue"></i>水面質點</span>
+            <span><i class="dot red"></i>追蹤質點</span>
+            <span><i class="orbit-sample"></i>圓周運動軌道</span>
+            <span><i class="arrow-sample"></i>瞬時速度方向</span>
+            <span><i class="component-sample"></i>水平／垂直位移分量</span>
+        </section>
+    </main>
     <script src="script.js"></script>
     <script src="../classroom.js?v=20260629"></script>
 </body>
 </html>
-
