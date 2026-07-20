@@ -1,5 +1,3 @@
-import * as THREE from "three";
-
 const canvas = document.getElementById("cube-canvas");
 const lastMoveEl = document.getElementById("last-move");
 const moveCountEl = document.getElementById("move-count");
@@ -46,27 +44,33 @@ const moveQueue = [];
 const spacing = 1.08;
 const turnDuration = 170;
 const quarterTurn = Math.PI / 2;
+const cameraFitRadius = 3.2;
 let activeTurn = null;
 let moveCount = 0;
 let isScrambling = false;
 let isRecording = false;
+let isSettingCase = false;
 let recordedMoves = [];
 let pendingRecording = [];
 let shortcuts = {};
+let caseLoadRequest = 0;
 
 const shortcutStorageKey = "rubiksCubeShortcutsV1";
 
 const targetViewQuaternion = new THREE.Quaternion();
 const viewTurnQuaternion = new THREE.Quaternion();
+const viewOrientationQuaternion = new THREE.Quaternion();
 const inverseViewQuaternion = new THREE.Quaternion();
+const initialViewQuaternion = new THREE.Quaternion();
+initialViewQuaternion.setFromEuler(new THREE.Euler(0.34, -0.45, 0));
 
 const stickerColors = {
   x1: 0xe03832,
   x_1: 0xff8a1d,
-  y1: 0xfff4df,
-  y_1: 0xf4d13d,
-  z1: 0x29a354,
-  z_1: 0x2978df,
+  y1: 0xf4d13d,
+  y_1: 0xfff4df,
+  z1: 0x2978df,
+  z_1: 0x29a354,
 };
 
 const faceSpecs = [
@@ -86,6 +90,9 @@ const moveFaces = {
   F: new THREE.Vector3(0, 0, 1),
   B: new THREE.Vector3(0, 0, -1),
   M: new THREE.Vector3(1, 0, 0),
+  X: new THREE.Vector3(1, 0, 0),
+  Y: new THREE.Vector3(0, 1, 0),
+  Z: new THREE.Vector3(0, 0, 1),
 };
 
 const faceAxes = {
@@ -96,6 +103,9 @@ const faceAxes = {
   D: "y",
   F: "z",
   B: "z",
+  X: "x",
+  Y: "y",
+  Z: "z",
 };
 
 const keyboardMoves = new Map([
@@ -192,17 +202,34 @@ function buildCube() {
   activeTurn = null;
   moveQueue.length = 0;
   delete canvas.dataset.lastResolvedMove;
-  targetViewQuaternion.identity();
-  world.quaternion.identity();
+  viewOrientationQuaternion.identity();
+  targetViewQuaternion.copy(initialViewQuaternion);
+  world.quaternion.copy(initialViewQuaternion);
   updateStatus("等待按鍵");
   updateSolvedStatus(true);
 }
 
-function enqueueMove(notation, silent = false) {
+function enqueueMove(notation, silent = false, duration = turnDuration) {
   const base = notation[0];
   const face = base.toUpperCase();
   const screenNormal = moveFaces[face];
   if (!screenNormal) return;
+
+  const isWholeCubeRotation = face === "X" || face === "Y" || face === "Z";
+
+  if (isWholeCubeRotation) {
+    const axis = face.toLowerCase();
+    const inverse = notation.endsWith("'");
+    moveQueue.push({
+      notation,
+      axis,
+      layers: [-1, 0, 1],
+      angle: (inverse ? 1 : -1) * quarterTurn,
+      silent,
+      duration,
+    });
+    return;
+  }
 
   inverseViewQuaternion.copy(targetViewQuaternion).invert();
   reusableVector.copy(screenNormal).applyQuaternion(inverseViewQuaternion);
@@ -229,6 +256,7 @@ function enqueueMove(notation, silent = false) {
     layers,
     angle: (inverse ? 1 : -1) * layer * quarterTurn,
     silent,
+    duration,
   };
   moveQueue.push(resolvedMove);
   canvas.dataset.lastResolvedMove = JSON.stringify({
@@ -265,7 +293,7 @@ function startNextTurn(now) {
 function updateActiveTurn(now) {
   if (!activeTurn) return;
 
-  const progress = Math.min((now - activeTurn.startedAt) / turnDuration, 1);
+  const progress = Math.min((now - activeTurn.startedAt) / activeTurn.duration, 1);
   const eased = 1 - Math.pow(1 - progress, 3);
   const angle = activeTurn.angle * eased;
 
@@ -298,7 +326,13 @@ function finishTurn() {
   }
 
   activeTurn = null;
-  updateSolvedStatus();
+  const solved = isCubeSolved();
+  updateSolvedStatus(solved);
+  window.dispatchEvent(
+    new CustomEvent("rubiks-turn-complete", {
+      detail: { solved, settingCase: isSettingCase, moveCount },
+    }),
+  );
 }
 
 function axisToVector(axis) {
@@ -313,6 +347,66 @@ function updateStatus(text, silent = false) {
     moveCount += 1;
   }
   moveCountEl.textContent = String(moveCount);
+}
+
+function parseAlgorithm(algorithm) {
+  const tokens = algorithm
+    .replace(/[’′]/g, "'")
+    .replace(/[()[\]]/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  const moves = [];
+
+  for (const token of tokens) {
+    const match = token.match(/^([RLUDFBMrludfbxyz])(2)?(')?$/);
+    if (!match) throw new Error(`不支援的公式符號：${token}`);
+
+    const notation = `${match[1]}${match[3] ?? ""}`;
+    const repetitions = match[2] ? 2 : 1;
+    for (let turn = 0; turn < repetitions; turn += 1) moves.push(notation);
+  }
+
+  return moves;
+}
+
+function invertMove(notation) {
+  return notation.endsWith("'") ? notation.slice(0, -1) : `${notation}'`;
+}
+
+function loadAlgorithmCase(algorithm) {
+  const solutionMoves = parseAlgorithm(algorithm);
+  const setupMoves = [...solutionMoves].reverse().map(invertMove);
+  const request = ++caseLoadRequest;
+
+  buildCube();
+  isSettingCase = true;
+  updateStatus("建立題目中", true);
+  for (const move of setupMoves) enqueueMove(move, true, 28);
+
+  return new Promise((resolve) => {
+    const timer = window.setInterval(() => {
+      if (request !== caseLoadRequest) {
+        window.clearInterval(timer);
+        resolve(false);
+        return;
+      }
+      if (activeTurn || moveQueue.length > 0) return;
+
+      window.clearInterval(timer);
+      isSettingCase = false;
+      moveCount = 0;
+      moveCountEl.textContent = "0";
+      updateStatus("等待作答", true);
+      updateSolvedStatus();
+      window.dispatchEvent(
+        new CustomEvent("rubiks-case-ready", {
+          detail: { algorithm, moves: solutionMoves.length },
+        }),
+      );
+      resolve(true);
+    }, 40);
+  });
 }
 
 function startRecording() {
@@ -545,6 +639,11 @@ function resizeRenderer() {
   if (canvas.width !== clientWidth || canvas.height !== clientHeight) {
     renderer.setSize(clientWidth, clientHeight, false);
     camera.aspect = clientWidth / Math.max(clientHeight, 1);
+    const verticalFov = THREE.MathUtils.degToRad(camera.fov);
+    const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * camera.aspect);
+    const limitingFov = Math.min(verticalFov, horizontalFov);
+    const cameraDistance = cameraFitRadius / Math.sin(limitingFov / 2);
+    camera.position.set(0, 0, cameraDistance);
     camera.updateProjectionMatrix();
   }
 }
@@ -580,7 +679,10 @@ function handleViewKey(key) {
   if (!turn) return false;
 
   viewTurnQuaternion.setFromAxisAngle(turn.axis, turn.angle);
-  targetViewQuaternion.premultiply(viewTurnQuaternion).normalize();
+  viewOrientationQuaternion.premultiply(viewTurnQuaternion).normalize();
+  targetViewQuaternion
+    .multiplyQuaternions(initialViewQuaternion, viewOrientationQuaternion)
+    .normalize();
   return true;
 }
 
@@ -616,6 +718,11 @@ window.addEventListener("keydown", (event) => {
   }
 
   if (activeTag === "BUTTON" && (event.key === " " || event.key === "Enter")) return;
+
+  if (isSettingCase) {
+    event.preventDefault();
+    return;
+  }
 
   const key = normalizeKeyboardEvent(event);
 
@@ -667,4 +774,10 @@ shortcutList.addEventListener("click", (event) => {
 shortcuts = loadShortcuts();
 renderShortcuts();
 buildCube();
+window.rubiksCubeSimulator = {
+  loadCase: loadAlgorithmCase,
+  parseAlgorithm,
+  reset: buildCube,
+  isBusy: () => isSettingCase || Boolean(activeTurn) || moveQueue.length > 0,
+};
 requestAnimationFrame(render);

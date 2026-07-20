@@ -1,0 +1,259 @@
+.practice-shell {
+  grid-template-columns: minmax(0, 1fr) minmax(27rem, 32rem);
+}
+
+.case-stage-label {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.4rem;
+  background: rgba(20, 20, 20, 0.72);
+  backdrop-filter: blur(10px);
+}
+
+.case-stage-label span,
+.case-type {
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.case-stage-label strong {
+  font-size: 1rem;
+}
+
+.practice-panel {
+  max-height: calc(100vh - 2.5rem);
+  overflow: hidden;
+}
+
+.practice-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.practice-header h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.45rem;
+}
+
+.practice-header p,
+.current-case p,
+.formula-count {
+  margin: 0;
+  color: var(--muted);
+}
+
+.practice-header .button-link {
+  flex: 0 0 auto;
+  min-height: 2.45rem;
+}
+
+.current-case {
+  display: grid;
+  gap: 0.8rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.current-case-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.current-case h2 {
+  margin: 0.1rem 0;
+  font-size: 1.25rem;
+}
+
+.practice-status {
+  color: var(--accent);
+  font-size: 0.86rem;
+  text-align: right;
+}
+
+.practice-status.is-complete {
+  color: var(--accent-strong);
+}
+
+.practice-status.is-active {
+  color: var(--danger);
+}
+
+#current-algorithm {
+  display: block;
+  padding: 0.7rem;
+  overflow-wrap: anywhere;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  background: #111318;
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.65;
+}
+
+.practice-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.formula-browser {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.formula-toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.55rem;
+}
+
+.formula-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  background: #15171b;
+}
+
+.formula-tabs button {
+  min-height: 2.2rem;
+  padding: 0.35rem 0.65rem;
+  border-color: transparent;
+  background: transparent;
+}
+
+.formula-tabs button[aria-pressed="true"] {
+  background: var(--surface-strong);
+  color: var(--accent);
+}
+
+.formula-tabs span {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.formula-search input {
+  width: 100%;
+  height: 100%;
+  min-height: 2.6rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+  background: #15171b;
+  color: var(--text);
+}
+
+.formula-count {
+  font-size: 0.8rem;
+}
+
+.formula-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  min-height: 0;
+  padding-right: 0.2rem;
+  overflow-y: auto;
+}
+
+.formula-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3.25rem;
+  text-align: left;
+}
+
+.formula-item[aria-current="true"] {
+  border-color: var(--accent);
+  background: rgba(111, 199, 255, 0.08);
+}
+
+.formula-id {
+  min-width: 3.5rem;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.formula-meta {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.formula-empty {
+  grid-column: 1 / -1;
+  color: var(--muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 1050px) {
+  .practice-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .practice-panel {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .formula-list {
+    max-height: 32rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .practice-header,
+  .current-case-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .practice-header .button-link {
+    width: 100%;
+  }
+
+  .practice-status {
+    text-align: left;
+  }
+
+  .formula-toolbar,
+  .practice-actions,
+  .formula-list {
+    grid-template-columns: 1fr;
+  }
+
+  .formula-empty {
+    grid-column: 1;
+  }
+}

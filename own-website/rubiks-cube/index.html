@@ -4,14 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>魔術方塊鍵盤模擬器</title>
-    <link rel="stylesheet" href="./styles.css?v=20260720-3" />
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://unpkg.com/three@0.165.0/build/three.module.js"
-        }
-      }
-    </script>
+    <link rel="stylesheet" href="./styles.css?v=20260720-5" />
+    <script defer src="https://unpkg.com/three@0.160.1/build/three.min.js"></script>
   </head>
   <body>
     <main class="app-shell">
@@ -39,9 +33,10 @@
           <p>直接按鍵轉層，方向鍵代表手推動整顆方塊的方向。</p>
         </div>
 
-        <div class="button-row">
+        <div class="button-row main-actions">
           <button id="scramble-button" type="button">隨機打亂</button>
           <button id="reset-button" type="button">復原</button>
+          <a class="button-link" href="./practice.html">公式練習</a>
         </div>
 
         <section class="key-section shortcut-section" aria-label="快捷鍵">
@@ -119,6 +114,6 @@
       </aside>
     </main>
 
-    <script type="module" src="./script.js?v=20260720-6"></script>
+    <script defer src="./script.js?v=20260720-14"></script>
   </body>
 </html>

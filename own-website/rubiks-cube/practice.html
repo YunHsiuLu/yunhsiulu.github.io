@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OLL／PLL 公式練習</title>
+    <link rel="stylesheet" href="./styles.css?v=20260720-5" />
+    <link rel="stylesheet" href="./practice.css?v=20260720-1" />
+    <script defer src="https://unpkg.com/three@0.160.1/build/three.min.js"></script>
+  </head>
+  <body>
+    <main class="app-shell practice-shell">
+      <section class="sim-stage" aria-label="公式練習魔術方塊">
+        <canvas id="cube-canvas" tabindex="0"></canvas>
+        <div class="case-stage-label">
+          <span id="stage-case-type">OLL</span>
+          <strong id="stage-case-name">OLL 27</strong>
+        </div>
+        <div class="hud" aria-live="polite">
+          <div>
+            <span class="hud-label">最後步驟</span>
+            <strong id="last-move">等待按鍵</strong>
+          </div>
+          <div>
+            <span class="hud-label">步數</span>
+            <strong id="move-count">0</strong>
+          </div>
+          <div>
+            <span class="hud-label">完成狀態</span>
+            <strong id="cube-status" class="is-solved">完成</strong>
+          </div>
+        </div>
+      </section>
+
+      <aside class="control-panel practice-panel" aria-label="公式練習控制面板">
+        <header class="practice-header">
+          <div>
+            <h1>OLL／PLL 公式練習</h1>
+            <p>選擇公式後，直接使用原本鍵位完成題目。</p>
+          </div>
+          <a class="button-link" href="./index.html">返回模擬器</a>
+        </header>
+
+        <section class="current-case" aria-label="目前題目">
+          <div class="current-case-heading">
+            <div>
+              <span id="current-case-type" class="case-type">OLL</span>
+              <h2 id="current-case-name">OLL 27</h2>
+              <p id="current-case-group">Sune</p>
+            </div>
+            <strong id="practice-status" class="practice-status">建立題目中</strong>
+          </div>
+          <code id="current-algorithm" hidden></code>
+          <div class="practice-actions">
+            <button id="toggle-formula-button" type="button" aria-pressed="false">顯示公式</button>
+            <button id="reload-case-button" type="button">重新出題</button>
+            <button id="random-case-button" type="button">隨機題目</button>
+          </div>
+        </section>
+
+        <section class="formula-browser" aria-label="公式清單">
+          <div class="formula-toolbar">
+            <div class="formula-tabs" role="group" aria-label="公式類型">
+              <button type="button" data-formula-type="OLL" aria-pressed="true">OLL <span>57</span></button>
+              <button type="button" data-formula-type="PLL" aria-pressed="false">PLL <span>21</span></button>
+            </div>
+            <label class="formula-search">
+              <span class="sr-only">搜尋公式</span>
+              <input id="formula-search" type="search" placeholder="搜尋編號或分類" autocomplete="off" />
+            </label>
+          </div>
+          <p id="formula-count" class="formula-count">57 個 OLL 公式</p>
+          <div id="formula-list" class="formula-list"></div>
+        </section>
+      </aside>
+    </main>
+
+    <div hidden>
+      <button id="scramble-button" type="button"></button>
+      <button id="reset-button" type="button"></button>
+      <button id="record-button" type="button"><span id="record-button-label"></span></button>
+      <p id="recording-status"></p>
+      <form id="shortcut-form"><select id="shortcut-key"><option value="0">0</option></select><input id="shortcut-name" /><button type="submit"></button></form>
+      <p id="recorded-sequence"></p>
+      <button id="cancel-shortcut-button" type="button"></button>
+      <div id="shortcut-list"></div>
+    </div>
+
+    <script defer src="./algorithms.js?v=20260720-2"></script>
+    <script defer src="./script.js?v=20260720-14"></script>
+    <script defer src="./practice.js?v=20260720-2"></script>
+  </body>
+</html>
