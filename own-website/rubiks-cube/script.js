@@ -208,11 +208,12 @@ function enqueueMove(notation, silent = false) {
     face === "M" ? [0] : base === base.toLowerCase() ? [0, layer] : [layer];
 
   const inverse = notation.endsWith("'");
+  const faceDirection = face === "L" ? -1 : 1;
   const resolvedMove = {
     notation,
     axis,
     layers,
-    angle: (inverse ? 1 : -1) * layer * quarterTurn,
+    angle: (inverse ? 1 : -1) * layer * quarterTurn * faceDirection,
     silent,
   };
   moveQueue.push(resolvedMove);
