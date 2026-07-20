@@ -84,8 +84,8 @@ const faceAxes = {
 };
 
 const keyboardMoves = new Map([
-  ["j", "R"],
-  ["k", "R'"],
+  ["j", "R'"],
+  ["k", "R"],
   ["d", "L"],
   ["f", "L'"],
   ["h", "F"],
@@ -101,8 +101,8 @@ const keyboardMoves = new Map([
 ]);
 
 const wideKeyboardMoves = new Map([
-  ["j", "r"],
-  ["k", "r'"],
+  ["j", "r'"],
+  ["k", "r"],
   ["d", "l"],
   ["f", "l'"],
   ["h", "f"],
