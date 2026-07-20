@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="拖曳繩端產生脈衝波，或用連續簡諧振源觀察正弦波、反射波與穿透波。">
+  <title>繩波傳播模擬</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../classroom.css?v=20260629">
+</head>
+<body>
+  <a href="../index.html" class="back-button" aria-label="回到模擬列表">
+    <span class="arrow" aria-hidden="true">←</span>
+  </a>
+
+  <main class="lab-shell">
+    <section class="stage-panel" aria-labelledby="page-title">
+      <div class="title-row">
+        <div>
+          <p class="eyebrow">TRANSVERSE WAVE ON A STRING</p>
+          <h1 id="page-title">繩波傳播模擬</h1>
+        </div>
+        <div class="readout" aria-live="polite">
+          <span>波速 <strong id="speedReadout">1.00</strong></span>
+          <span>時間 <strong id="timeReadout">0.0 s</strong></span>
+        </div>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="ropeCanvas" width="1200" height="520" aria-label="繩波傳播畫面"></canvas>
+      </div>
+
+      <div class="hint-bar">
+        <span>手動模式：拖曳左端把手產生脈衝波。</span>
+        <span>組合繩：介面會同時出現反射波與穿透波。</span>
+      </div>
+    </section>
+
+    <aside class="controls" aria-label="模擬控制">
+      <section class="control-group">
+        <h2>波源</h2>
+        <div class="segmented" role="group" aria-label="波源模式">
+          <button type="button" class="is-active" data-source="manual" aria-pressed="true">手動拖曳</button>
+          <button type="button" data-source="oscillator" aria-pressed="false">彈簧振源</button>
+        </div>
+        <label class="slider-row">
+          <span>振幅 <output id="amplitudeValue">70 px</output></span>
+          <input id="amplitude" type="range" min="20" max="130" step="1" value="70">
+        </label>
+        <label class="slider-row">
+          <span>頻率 <output id="frequencyValue">0.80 Hz</output></span>
+          <input id="frequency" type="range" min="0.20" max="2.20" step="0.05" value="0.80">
+        </label>
+        <div class="pulse-controls" aria-label="單次脈衝">
+          <p>單次脈衝</p>
+          <div class="pulse-buttons">
+            <button type="button" data-pulse="square">方波</button>
+            <button type="button" data-pulse="triangle">三角波</button>
+            <button type="button" data-pulse="sine">正弦波</button>
+            <button type="button" data-pulse="half-sine">半正弦波</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="control-group">
+        <h2>繩子組合</h2>
+        <label class="select-row">
+          <span>介質</span>
+          <select id="mediumMode">
+            <option value="uniform">單一繩子</option>
+            <option value="light-heavy">左輕右重</option>
+            <option value="heavy-light">左重右輕</option>
+          </select>
+        </label>
+        <label class="slider-row">
+          <span>阻尼 <output id="dampingValue">0.4%</output></span>
+          <input id="damping" type="range" min="0" max="1.5" step="0.1" value="0.4">
+        </label>
+      </section>
+
+      <section class="control-group" id="boundaryGroup">
+        <h2>右端邊界</h2>
+        <div class="segmented vertical" role="group" aria-label="反射模式">
+          <button type="button" class="is-active" data-boundary="absorbing" aria-pressed="true">不顯示反射</button>
+          <button type="button" data-boundary="fixed" aria-pressed="false">固定端反射</button>
+          <button type="button" data-boundary="free" aria-pressed="false">自由端反射</button>
+        </div>
+      </section>
+
+      <section class="control-group actions">
+        <button type="button" id="pauseButton">暫停</button>
+        <button type="button" id="resetButton">重設繩子</button>
+      </section>
+    </aside>
+  </main>
+
+  <script src="script.js"></script>
+  <script src="../classroom.js?v=20260629"></script>
+</body>
+</html>
