@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>魔術方塊鍵盤模擬器</title>
+    <link rel="stylesheet" href="./styles.css?v=20260720-2" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.165.0/build/three.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="sim-stage" aria-label="魔術方塊模擬器">
+        <canvas id="cube-canvas"></canvas>
+        <div class="hud" aria-live="polite">
+          <div>
+            <span class="hud-label">最後步驟</span>
+            <strong id="last-move">等待按鍵</strong>
+          </div>
+          <div>
+            <span class="hud-label">步數</span>
+            <strong id="move-count">0</strong>
+          </div>
+          <div>
+            <span class="hud-label">完成狀態</span>
+            <strong id="cube-status" class="is-solved">完成</strong>
+          </div>
+        </div>
+      </section>
+
+      <aside class="control-panel" aria-label="控制面板">
+        <div class="panel-header">
+          <h1>魔術方塊鍵盤模擬器</h1>
+          <p>直接按鍵轉層，方向鍵代表手推動整顆方塊的方向。</p>
+        </div>
+
+        <div class="button-row">
+          <button id="scramble-button" type="button">隨機打亂</button>
+          <button id="reset-button" type="button">復原</button>
+        </div>
+
+        <section class="key-section" aria-label="轉動按鍵">
+          <h2>轉動</h2>
+          <p class="notation">按住 <kbd>Shift</kbd> 再按外側面轉動鍵，會轉兩層。例如 <kbd>Shift</kbd> + <kbd>j</kbd> 是 r。中間層 M 不受 Shift 影響。</p>
+          <div class="key-grid">
+            <span><kbd>j</kbd> R</span>
+            <span><kbd>k</kbd> R'</span>
+            <span><kbd>d</kbd> L</span>
+            <span><kbd>f</kbd> L'</span>
+            <span><kbd>h</kbd> F</span>
+            <span><kbd>g</kbd> F'</span>
+            <span><kbd>u</kbd> U</span>
+            <span><kbd>r</kbd> U'</span>
+            <span><kbd>x</kbd> D</span>
+            <span><kbd>.</kbd> D'</span>
+            <span><kbd>,</kbd> B</span>
+            <span><kbd>c</kbd> B'</span>
+            <span><kbd>Space</kbd> M</span>
+            <span><kbd>o</kbd> M'</span>
+          </div>
+        </section>
+
+        <section class="key-section" aria-label="視角按鍵">
+          <h2>視角</h2>
+          <div class="key-grid">
+            <span><kbd>←</kbd> 整顆往左轉</span>
+            <span><kbd>→</kbd> 整顆往右轉</span>
+            <span><kbd>↑</kbd> 整顆往上轉</span>
+            <span><kbd>↓</kbd> 整顆往下轉</span>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
