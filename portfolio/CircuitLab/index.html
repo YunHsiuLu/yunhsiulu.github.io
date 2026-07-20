@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>電路模擬工具</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="back-link" href="../index.html" aria-label="返回物理互動實驗室">←</a>
+        <div>
+          <p class="eyebrow">Circuit Sandbox</p>
+          <h1>電路模擬工具</h1>
+        </div>
+        <div class="topbar-actions">
+          <button id="runBtn" type="button">執行模擬</button>
+          <button id="resetBtn" type="button">清空</button>
+        </div>
+      </header>
+
+      <section class="workspace" aria-label="電路模擬工作區">
+        <aside class="tool-panel" aria-label="零件與工具">
+          <section class="panel-block">
+            <h2>零件</h2>
+            <div class="tool-grid" id="componentTools">
+              <button type="button" data-tool="dc">DC</button>
+              <button type="button" data-tool="ground">Ground</button>
+              <button type="button" data-tool="resistor">R</button>
+              <button type="button" data-tool="capacitor">C</button>
+              <button type="button" data-tool="inductor">L</button>
+              <button type="button" data-tool="voltmeter">V meter</button>
+              <button type="button" data-tool="ammeter">A meter</button>
+              <button type="button" data-tool="label">Label</button>
+            </div>
+          </section>
+
+          <section class="panel-block">
+            <h2>工具</h2>
+            <div class="tool-grid compact">
+              <button id="wireBtn" type="button">導線</button>
+              <button id="selectBtn" type="button">選取</button>
+              <button id="deleteBtn" type="button">刪除</button>
+              <button id="rotateBtn" type="button">旋轉</button>
+            </div>
+          </section>
+
+          <section class="panel-block">
+            <h2>範例</h2>
+            <div class="preset-list">
+              <button type="button" data-preset="rc">RC 充電</button>
+              <button type="button" data-preset="lc">LC 振盪</button>
+              <button type="button" data-preset="rlc">RLC 阻尼</button>
+            </div>
+          </section>
+        </aside>
+
+        <section class="board-panel" aria-label="電路板">
+          <div class="board-status">
+            <span id="modeText">選取模式</span>
+            <span id="messageText">點選零件後，在格線上放置。</span>
+          </div>
+          <svg id="circuitBoard" role="img" aria-label="可編輯電路圖" viewBox="0 0 980 640"></svg>
+        </section>
+
+        <aside class="inspector" aria-label="屬性與示波器">
+          <section class="panel-block">
+            <h2>屬性</h2>
+            <div id="propertyPanel" class="property-panel">
+              <p>選取零件或導線端點後可調整數值。</p>
+            </div>
+          </section>
+
+          <section class="panel-block">
+            <div class="scope-header">
+              <h2>示波器</h2>
+              <label class="switch">
+                <input id="scopeToggle" type="checkbox" checked />
+                <span>顯示</span>
+              </label>
+            </div>
+            <canvas id="scopeCanvas" width="720" height="360"></canvas>
+            <div id="scopeLegend" class="scope-legend"></div>
+          </section>
+
+          <section class="panel-block compact-info">
+            <h2>模擬設定</h2>
+            <label class="field-row">
+              <span>時間</span>
+              <input id="simTime" type="number" min="0.001" max="10" step="0.001" value="0.04" />
+              <small>s</small>
+            </label>
+            <label class="field-row">
+              <span>步長</span>
+              <input id="timeStep" type="number" min="0.000001" max="0.01" step="0.000001" value="0.00005" />
+              <small>s</small>
+            </label>
+          </section>
+        </aside>
+      </section>
+    </main>
+  </body>
+</html>

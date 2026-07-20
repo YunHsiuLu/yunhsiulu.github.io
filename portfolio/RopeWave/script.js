@@ -126,9 +126,27 @@ function pulseShape(type, progress) {
   return Math.sin(Math.PI * progress);
 }
 
+function pulseSample(type, center, width, position) {
+  const start = center - width / 2;
+  return pulseShape(type, (position - start) / width);
+}
+
 function idealPulseDisplacement(pulse, position) {
+  const rightPoint = points - 1;
   const start = pulse.center - pulse.width / 2;
-  return clampDisplacement(pulse.amplitude * pulseShape(pulse.type, (position - start) / pulse.width));
+  let value = pulse.amplitude * pulseShape(pulse.type, (position - start) / pulse.width);
+
+  if (
+    state.medium === 'uniform'
+    && (state.boundary === 'fixed' || state.boundary === 'free')
+    && pulse.direction > 0
+    && pulse.center + pulse.width / 2 > rightPoint
+  ) {
+    const reflectionSign = state.boundary === 'fixed' ? -1 : 1;
+    value += pulse.amplitude * reflectionSign * pulseSample(pulse.type, pulse.center, pulse.width, 2 * rightPoint - position);
+  }
+
+  return clampDisplacement(value);
 }
 
 function sendPulse(type) {
@@ -178,9 +196,9 @@ function reflectAtRightEnd(pulse, rightPoint) {
     pulse.absorbing = true;
     return;
   }
+  if (state.medium === 'uniform' && pulse.center - pulse.width / 2 <= rightPoint) return;
 
-  const overshoot = pulse.center + pulse.width / 2 - rightPoint;
-  pulse.center = rightPoint - overshoot - pulse.width / 2;
+  pulse.center = 2 * rightPoint - pulse.center;
   pulse.direction = -1;
   if (state.medium === 'uniform' && state.boundary === 'fixed') pulse.amplitude *= -1;
 }
