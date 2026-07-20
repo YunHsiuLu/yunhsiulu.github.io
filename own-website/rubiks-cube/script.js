@@ -6,6 +6,15 @@ const moveCountEl = document.getElementById("move-count");
 const cubeStatusEl = document.getElementById("cube-status");
 const scrambleButton = document.getElementById("scramble-button");
 const resetButton = document.getElementById("reset-button");
+const recordButton = document.getElementById("record-button");
+const recordButtonLabel = document.getElementById("record-button-label");
+const recordingStatusEl = document.getElementById("recording-status");
+const shortcutForm = document.getElementById("shortcut-form");
+const shortcutKeyInput = document.getElementById("shortcut-key");
+const shortcutNameInput = document.getElementById("shortcut-name");
+const recordedSequenceEl = document.getElementById("recorded-sequence");
+const cancelShortcutButton = document.getElementById("cancel-shortcut-button");
+const shortcutList = document.getElementById("shortcut-list");
 
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -40,6 +49,12 @@ const quarterTurn = Math.PI / 2;
 let activeTurn = null;
 let moveCount = 0;
 let isScrambling = false;
+let isRecording = false;
+let recordedMoves = [];
+let pendingRecording = [];
+let shortcuts = {};
+
+const shortcutStorageKey = "rubiksCubeShortcutsV1";
 
 const targetViewQuaternion = new THREE.Quaternion();
 const viewTurnQuaternion = new THREE.Quaternion();
@@ -300,6 +315,193 @@ function updateStatus(text, silent = false) {
   moveCountEl.textContent = String(moveCount);
 }
 
+function startRecording() {
+  if (isScrambling || activeTurn || moveQueue.length > 0) {
+    recordingStatusEl.textContent = "請等待轉動完成";
+    return;
+  }
+
+  isRecording = true;
+  recordedMoves = [];
+  pendingRecording = [];
+  shortcutForm.hidden = true;
+  recordButton.classList.add("is-recording");
+  recordButton.setAttribute("aria-pressed", "true");
+  recordButtonLabel.textContent = "結束錄製";
+  recordingStatusEl.textContent = "錄製中：0 步";
+  scrambleButton.disabled = true;
+  resetButton.disabled = true;
+}
+
+function stopRecording() {
+  isRecording = false;
+  recordButton.classList.remove("is-recording");
+  recordButton.setAttribute("aria-pressed", "false");
+  recordButtonLabel.textContent = "開始錄製";
+  scrambleButton.disabled = false;
+  resetButton.disabled = false;
+
+  if (recordedMoves.length === 0) {
+    recordingStatusEl.textContent = "沒有錄製任何步驟";
+    shortcutForm.hidden = true;
+    return;
+  }
+
+  pendingRecording = [...recordedMoves];
+  const availableSlot = findAvailableShortcutSlot();
+  shortcutKeyInput.value = availableSlot;
+  shortcutNameInput.value = shortcuts[availableSlot]?.name ?? "";
+  recordedSequenceEl.textContent = `${pendingRecording.length} 步：${pendingRecording.join(" ")}`;
+  recordingStatusEl.textContent = `錄製完成，共 ${pendingRecording.length} 步`;
+  shortcutForm.hidden = false;
+  shortcutNameInput.focus();
+}
+
+function toggleRecording() {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+}
+
+function recordMove(notation) {
+  if (!isRecording) return;
+  recordedMoves.push(notation);
+  recordingStatusEl.textContent = `錄製中：${recordedMoves.length} 步`;
+}
+
+function saveShortcut(event) {
+  event.preventDefault();
+  if (pendingRecording.length === 0) return;
+
+  const digit = shortcutKeyInput.value;
+  const name = shortcutNameInput.value.trim() || `快捷鍵 ${digit}`;
+  shortcuts[digit] = { name, moves: [...pendingRecording] };
+
+  if (!persistShortcuts()) return;
+
+  pendingRecording = [];
+  shortcutForm.hidden = true;
+  shortcutNameInput.blur();
+  recordingStatusEl.textContent = `已儲存：${digit} ${name}`;
+  renderShortcuts();
+}
+
+function cancelShortcut() {
+  pendingRecording = [];
+  shortcutForm.hidden = true;
+  shortcutNameInput.blur();
+  recordingStatusEl.textContent = "已取消儲存";
+}
+
+function playShortcut(digit) {
+  if (isRecording || !shortcuts[digit]) return;
+
+  const shortcut = shortcuts[digit];
+  for (const move of shortcut.moves) enqueueMove(move);
+  recordingStatusEl.textContent = `執行 ${digit}：${shortcut.name}（${shortcut.moves.length} 步）`;
+}
+
+function deleteShortcut(digit) {
+  if (!shortcuts[digit]) return;
+  const name = shortcuts[digit].name;
+  delete shortcuts[digit];
+  if (!persistShortcuts()) return;
+  recordingStatusEl.textContent = `已刪除：${digit} ${name}`;
+  renderShortcuts();
+}
+
+function findAvailableShortcutSlot() {
+  for (let digit = 0; digit <= 9; digit += 1) {
+    if (!shortcuts[String(digit)]) return String(digit);
+  }
+  return "0";
+}
+
+function loadShortcuts() {
+  try {
+    const saved = JSON.parse(window.localStorage.getItem(shortcutStorageKey) ?? "{}");
+    const validShortcuts = {};
+
+    for (let digit = 0; digit <= 9; digit += 1) {
+      const key = String(digit);
+      const shortcut = saved[key];
+      if (
+        typeof shortcut?.name === "string" &&
+        Array.isArray(shortcut.moves) &&
+        shortcut.moves.length > 0 &&
+        shortcut.moves.every((move) => moveFaces[move[0]?.toUpperCase()])
+      ) {
+        validShortcuts[key] = {
+          name: shortcut.name.slice(0, 20),
+          moves: [...shortcut.moves],
+        };
+      }
+    }
+
+    return validShortcuts;
+  } catch {
+    return {};
+  }
+}
+
+function persistShortcuts() {
+  try {
+    window.localStorage.setItem(shortcutStorageKey, JSON.stringify(shortcuts));
+    return true;
+  } catch {
+    recordingStatusEl.textContent = "無法儲存快捷鍵";
+    return false;
+  }
+}
+
+function renderShortcuts() {
+  shortcutList.replaceChildren();
+  const configuredDigits = Object.keys(shortcuts).sort();
+
+  if (configuredDigits.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "shortcut-empty";
+    empty.textContent = "尚未設定快捷鍵";
+    shortcutList.append(empty);
+    return;
+  }
+
+  for (const digit of configuredDigits) {
+    const shortcut = shortcuts[digit];
+    const item = document.createElement("div");
+    item.className = "shortcut-item";
+
+    const runButton = document.createElement("button");
+    runButton.type = "button";
+    runButton.className = "shortcut-run";
+    runButton.dataset.shortcut = digit;
+
+    const keycap = document.createElement("kbd");
+    keycap.textContent = digit;
+
+    const details = document.createElement("span");
+    details.className = "shortcut-details";
+    const name = document.createElement("strong");
+    name.textContent = shortcut.name;
+    const moves = document.createElement("small");
+    moves.textContent = shortcut.moves.join(" ");
+    details.append(name, moves);
+    runButton.append(keycap, details);
+
+    const deleteButton = document.createElement("button");
+    deleteButton.type = "button";
+    deleteButton.className = "shortcut-delete";
+    deleteButton.dataset.deleteShortcut = digit;
+    deleteButton.setAttribute("aria-label", `刪除快捷鍵 ${digit}`);
+    deleteButton.textContent = "×";
+
+    item.append(runButton, deleteButton);
+    shortcutList.append(item);
+  }
+}
+
 function updateSolvedStatus(solved = isCubeSolved()) {
   cubeStatusEl.textContent = solved ? "完成" : "未完成";
   cubeStatusEl.classList.toggle("is-solved", solved);
@@ -407,7 +609,21 @@ function scramble() {
 }
 
 window.addEventListener("keydown", (event) => {
+  const activeTag = document.activeElement?.tagName;
+  if (activeTag === "INPUT" || activeTag === "TEXTAREA" || activeTag === "SELECT") {
+    if (event.key === "Escape") cancelShortcut();
+    return;
+  }
+
+  if (activeTag === "BUTTON" && (event.key === " " || event.key === "Enter")) return;
+
   const key = normalizeKeyboardEvent(event);
+
+  if (!isRecording && /^[0-9]$/.test(key) && shortcuts[key]) {
+    event.preventDefault();
+    playShortcut(key);
+    return;
+  }
 
   if (handleViewKey(key)) {
     event.preventDefault();
@@ -418,7 +634,9 @@ window.addEventListener("keydown", (event) => {
 
   if (moveMap.has(key)) {
     event.preventDefault();
-    enqueueMove(moveMap.get(key));
+    const notation = moveMap.get(key);
+    enqueueMove(notation);
+    recordMove(notation);
   }
 });
 
@@ -432,6 +650,21 @@ function normalizeKeyboardEvent(event) {
 
 scrambleButton.addEventListener("click", scramble);
 resetButton.addEventListener("click", buildCube);
+recordButton.addEventListener("click", toggleRecording);
+shortcutForm.addEventListener("submit", saveShortcut);
+cancelShortcutButton.addEventListener("click", cancelShortcut);
+shortcutList.addEventListener("click", (event) => {
+  const deleteButton = event.target.closest("[data-delete-shortcut]");
+  if (deleteButton) {
+    deleteShortcut(deleteButton.dataset.deleteShortcut);
+    return;
+  }
 
+  const runButton = event.target.closest("[data-shortcut]");
+  if (runButton) playShortcut(runButton.dataset.shortcut);
+});
+
+shortcuts = loadShortcuts();
+renderShortcuts();
 buildCube();
 requestAnimationFrame(render);

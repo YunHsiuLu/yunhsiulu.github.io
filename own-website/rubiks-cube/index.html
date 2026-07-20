@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>魔術方塊鍵盤模擬器</title>
-    <link rel="stylesheet" href="./styles.css?v=20260720-2" />
+    <link rel="stylesheet" href="./styles.css?v=20260720-3" />
     <script type="importmap">
       {
         "imports": {
@@ -44,6 +44,48 @@
           <button id="reset-button" type="button">復原</button>
         </div>
 
+        <section class="key-section shortcut-section" aria-label="快捷鍵">
+          <div class="section-heading">
+            <h2>快捷鍵</h2>
+            <button id="record-button" type="button" aria-pressed="false">
+              <span class="record-dot" aria-hidden="true"></span>
+              <span id="record-button-label">開始錄製</span>
+            </button>
+          </div>
+          <p id="recording-status" class="notation" aria-live="polite">尚未錄製</p>
+
+          <form id="shortcut-form" class="shortcut-form" hidden>
+            <p id="recorded-sequence" class="sequence-preview"></p>
+            <div class="shortcut-fields">
+              <label for="shortcut-key">
+                數字鍵
+                <select id="shortcut-key">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                  <option value="7">7</option>
+                  <option value="8">8</option>
+                  <option value="9">9</option>
+                </select>
+              </label>
+              <label for="shortcut-name">
+                快捷鍵名稱
+                <input id="shortcut-name" type="text" maxlength="20" autocomplete="off" required />
+              </label>
+            </div>
+            <div class="shortcut-form-actions">
+              <button id="save-shortcut-button" type="submit">儲存</button>
+              <button id="cancel-shortcut-button" type="button">取消</button>
+            </div>
+          </form>
+
+          <div id="shortcut-list" class="shortcut-list" aria-live="polite"></div>
+        </section>
+
         <section class="key-section" aria-label="轉動按鍵">
           <h2>轉動</h2>
           <p class="notation">按住 <kbd>Shift</kbd> 再按外側面轉動鍵，會轉兩層。例如 <kbd>Shift</kbd> + <kbd>j</kbd> 是 r'。中間層 M 不受 Shift 影響。</p>
@@ -77,6 +119,6 @@
       </aside>
     </main>
 
-    <script type="module" src="./script.js?v=20260720-5"></script>
+    <script type="module" src="./script.js?v=20260720-6"></script>
   </body>
 </html>
