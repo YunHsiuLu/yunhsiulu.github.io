@@ -21,7 +21,8 @@
           <h1 id="page-title">繩波傳播模擬</h1>
         </div>
         <div class="readout" aria-live="polite">
-          <span>波速 <strong id="speedReadout">1.00</strong></span>
+          <span>繩長 <strong id="lengthReadout">1.00 m</strong></span>
+          <span>波速 <strong id="speedReadout">1.00 m/s</strong></span>
           <span>時間 <strong id="timeReadout">0.0 s</strong></span>
         </div>
       </div>
@@ -31,7 +32,8 @@
       </div>
 
       <div class="hint-bar">
-        <span>手動模式：拖曳左端把手產生脈衝波。</span>
+        <span>手動：拖曳左端。振盪：連續正弦波。脈波：按形狀發射單次波。</span>
+        <span>繩長 L = 4 m、波速 v = 1 m/s，駐波頻率 f<sub>n</sub> = n/8 Hz。</span>
         <span>組合繩：介面會同時出現反射波與穿透波。</span>
       </div>
     </section>
@@ -40,8 +42,9 @@
       <section class="control-group">
         <h2>波源</h2>
         <div class="segmented" role="group" aria-label="波源模式">
-          <button type="button" class="is-active" data-source="manual" aria-pressed="true">手動拖曳</button>
-          <button type="button" data-source="oscillator" aria-pressed="false">彈簧振源</button>
+          <button type="button" class="is-active" data-source="manual" aria-pressed="true">手動</button>
+          <button type="button" data-source="oscillator" aria-pressed="false">振盪</button>
+          <button type="button" data-source="pulse" aria-pressed="false">脈波</button>
         </div>
         <label class="slider-row">
           <span>振幅 <output id="amplitudeValue">70 px</output></span>
@@ -49,10 +52,22 @@
         </label>
         <label class="slider-row">
           <span>頻率 <output id="frequencyValue">0.80 Hz</output></span>
-          <input id="frequency" type="range" min="0.20" max="2.20" step="0.05" value="0.80">
+          <input id="frequency" type="range" min="0.001" max="5" step="any" value="0.250">
         </label>
-        <div class="pulse-controls" aria-label="單次脈衝">
-          <p>單次脈衝</p>
+        <div class="harmonic-controls" aria-label="第 n 個駐波">
+          <p>第 n 個駐波 <output id="harmonicFrequency">0.250 Hz</output></p>
+          <div class="harmonic-picker">
+            <button type="button" data-harmonic-step="-1" aria-label="降低駐波階數">−</button>
+            <label>
+              <span>n</span>
+              <input id="harmonicOrder" type="number" min="1" max="40" step="1" value="2">
+            </label>
+            <button type="button" data-harmonic-step="1" aria-label="提高駐波階數">＋</button>
+            <button type="button" id="applyHarmonic">套用</button>
+          </div>
+        </div>
+        <div class="pulse-controls" aria-label="脈波">
+          <p>脈波</p>
           <div class="pulse-buttons">
             <button type="button" data-pulse="square">方波</button>
             <button type="button" data-pulse="triangle">三角波</button>
@@ -81,9 +96,9 @@
       <section class="control-group" id="boundaryGroup">
         <h2>右端邊界</h2>
         <div class="segmented vertical" role="group" aria-label="反射模式">
-          <button type="button" class="is-active" data-boundary="absorbing" aria-pressed="true">不顯示反射</button>
-          <button type="button" data-boundary="fixed" aria-pressed="false">固定端反射</button>
-          <button type="button" data-boundary="free" aria-pressed="false">自由端反射</button>
+          <button type="button" data-boundary="fixed" aria-pressed="false">固定端</button>
+          <button type="button" data-boundary="free" aria-pressed="false">鬆弛端</button>
+          <button type="button" class="is-active" data-boundary="absorbing" aria-pressed="true">無邊界</button>
         </div>
       </section>
 

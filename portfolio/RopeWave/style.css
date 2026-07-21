@@ -185,7 +185,7 @@ canvas {
 
 .segmented {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 6px;
   margin-bottom: 14px;
 }
@@ -210,7 +210,8 @@ canvas {
   border-color: var(--cyan);
 }
 
-.segmented button.is-active {
+.segmented button.is-active,
+.pulse-buttons button.is-active {
   color: #07111f;
   border-color: var(--cyan);
   background: var(--cyan);
@@ -239,12 +240,14 @@ output {
   font-weight: 700;
 }
 
+.harmonic-controls,
 .pulse-controls {
   display: grid;
   gap: 8px;
   margin-top: 15px;
 }
 
+.harmonic-controls p,
 .pulse-controls p {
   margin: 0;
   color: var(--muted);
@@ -257,6 +260,19 @@ output {
   gap: 6px;
 }
 
+.harmonic-controls p {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.harmonic-picker {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  gap: 6px;
+}
+
+.harmonic-picker button,
 .pulse-buttons button {
   min-height: 38px;
   color: var(--ink);
@@ -264,6 +280,37 @@ output {
   background: rgba(16, 36, 58, .76);
 }
 
+.harmonic-picker button {
+  padding: 0 8px;
+  font-weight: 700;
+}
+
+.harmonic-picker label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 8px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  background: rgba(16, 36, 58, .48);
+}
+
+.harmonic-picker input {
+  width: 100%;
+  min-width: 0;
+  color: var(--ink);
+  border: 0;
+  background: transparent;
+  text-align: center;
+}
+
+.harmonic-picker #applyHarmonic {
+  grid-column: 1 / -1;
+}
+
+.harmonic-picker button:hover,
+.harmonic-picker button:focus-visible,
 .pulse-buttons button:hover,
 .pulse-buttons button:focus-visible {
   color: #07111f;

@@ -4,6 +4,10 @@ const ctx = canvas.getContext('2d');
 const sourceButtons = [...document.querySelectorAll('[data-source]')];
 const boundaryButtons = [...document.querySelectorAll('[data-boundary]')];
 const pulseButtons = [...document.querySelectorAll('[data-pulse]')];
+const harmonicStepButtons = [...document.querySelectorAll('[data-harmonic-step]')];
+const harmonicOrderInput = document.getElementById('harmonicOrder');
+const harmonicFrequency = document.getElementById('harmonicFrequency');
+const applyHarmonicButton = document.getElementById('applyHarmonic');
 const amplitudeSlider = document.getElementById('amplitude');
 const frequencySlider = document.getElementById('frequency');
 const dampingSlider = document.getElementById('damping');
@@ -14,6 +18,7 @@ const resetButton = document.getElementById('resetButton');
 const amplitudeValue = document.getElementById('amplitudeValue');
 const frequencyValue = document.getElementById('frequencyValue');
 const dampingValue = document.getElementById('dampingValue');
+const lengthReadout = document.getElementById('lengthReadout');
 const speedReadout = document.getElementById('speedReadout');
 const timeReadout = document.getElementById('timeReadout');
 
@@ -21,6 +26,7 @@ const state = {
   source: 'manual',
   boundary: 'absorbing',
   medium: 'uniform',
+  pulseType: 'half-sine',
   paused: false,
   dragging: false,
   manualTarget: 0,
@@ -30,11 +36,17 @@ const state = {
 };
 
 const points = 240;
+const ropeLengthMeters = 4;
+const baseWaveSpeed = 1;
+const fundamentalFrequency = baseWaveSpeed / (2 * ropeLengthMeters);
+const gridSpacingMeters = ropeLengthMeters / (points - 1);
+const simulationStep = 0.006;
 const y = new Float32Array(points);
 const yOld = new Float32Array(points);
 const yNew = new Float32Array(points);
 const speeds = new Float32Array(points);
 const idealPulses = [];
+const manualHistory = [];
 const pixelRatio = Math.max(1, window.devicePixelRatio || 1);
 
 let viewWidth = 1200;
@@ -62,6 +74,7 @@ function resetRope() {
   yOld.fill(0);
   yNew.fill(0);
   idealPulses.length = 0;
+  manualHistory.length = 0;
   state.manualTarget = 0;
   state.manualValue = 0;
   state.time = 0;
@@ -71,46 +84,91 @@ function updateMedium() {
   state.medium = mediumSelect.value;
   for (let i = 0; i < points; i += 1) {
     const rightSide = i >= points / 2;
-    if (state.medium === 'light-heavy') speeds[i] = rightSide ? 0.58 : 1;
-    else if (state.medium === 'heavy-light') speeds[i] = rightSide ? 1 : 0.58;
-    else speeds[i] = 1;
+    if (state.medium === 'light-heavy') speeds[i] = rightSide ? 0.58 : baseWaveSpeed;
+    else if (state.medium === 'heavy-light') speeds[i] = rightSide ? baseWaveSpeed : 0.58;
+    else speeds[i] = baseWaveSpeed;
   }
 
   const composite = state.medium !== 'uniform';
   boundaryGroup.classList.toggle('is-muted', composite);
-  speedReadout.textContent = composite ? '1.00 / 0.58' : speeds[0].toFixed(2);
+  lengthReadout.textContent = `${ropeLengthMeters.toFixed(2)} m`;
+  speedReadout.textContent = composite ? '1.00 / 0.58 m/s' : `${speeds[0].toFixed(2)} m/s`;
   resetRope();
 }
 
 function updateLabels() {
   amplitudeValue.textContent = `${amplitudeSlider.value} px`;
-  frequencyValue.textContent = `${Number(frequencySlider.value).toFixed(2)} Hz`;
+  frequencyValue.textContent = `${Number(frequencySlider.value).toFixed(3)} Hz`;
   dampingValue.textContent = `${Number(dampingSlider.value).toFixed(1)}%`;
+  updateHarmonicReadout();
+}
+
+function clampHarmonicOrder(value) {
+  const maxOrder = Number(harmonicOrderInput.max);
+  const order = Math.round(Number(value));
+  if (!Number.isFinite(order)) return 1;
+  return Math.max(1, Math.min(maxOrder, order));
+}
+
+function harmonicFrequencyFor(order) {
+  return order * fundamentalFrequency;
+}
+
+function updateHarmonicReadout() {
+  if (!harmonicOrderInput || !harmonicFrequency) return;
+  const order = clampHarmonicOrder(harmonicOrderInput.value);
+  harmonicOrderInput.value = String(order);
+  harmonicFrequency.textContent = `${harmonicFrequencyFor(order).toFixed(3)} Hz`;
+}
+
+function applyHarmonicOrder(order = harmonicOrderInput.value) {
+  const nextOrder = clampHarmonicOrder(order);
+  const nextFrequency = harmonicFrequencyFor(nextOrder);
+  harmonicOrderInput.value = String(nextOrder);
+  frequencySlider.value = nextFrequency.toFixed(3);
+  state.source = 'oscillator';
+  setActive(sourceButtons, sourceButtons.find((item) => item.dataset.source === 'oscillator'));
+  updateLabels();
+  resetRope();
 }
 
 function sourceDisplacement(dt) {
   if (state.source === 'oscillator') {
-    const amp = Number(amplitudeSlider.value);
-    const freq = Number(frequencySlider.value);
-    return amp * Math.sin(2 * Math.PI * freq * state.time);
+    return oscillatorSourceAt(state.time);
   }
 
   state.manualValue += (state.manualTarget - state.manualValue) * Math.min(1, dt * 18);
   return state.manualValue;
 }
 
-function absorbRightEnd(strength) {
-  const start = points - 78;
-  for (let i = start; i < points; i += 1) {
-    const edge = (i - start) / (points - 1 - start);
-    const fade = Math.max(0, 1 - strength * edge * edge);
-    yNew[i] *= fade;
-    y[i] *= fade;
-    yOld[i] *= fade;
+function recordManualSource(value) {
+  manualHistory.push({ time: state.time, value });
+
+  const longestDelay = (ropeLengthMeters * 2.2) / Math.min(0.58, baseWaveSpeed);
+  while (manualHistory.length > 2 && manualHistory[1].time < state.time - longestDelay) {
+    manualHistory.shift();
   }
-  yNew[points - 1] = 0;
-  y[points - 1] = 0;
-  yOld[points - 1] = 0;
+}
+
+function sampleManualHistory(sampleTime) {
+  if (sampleTime < 0 || manualHistory.length === 0) return 0;
+  if (sampleTime <= manualHistory[0].time) return manualHistory[0].value;
+
+  const last = manualHistory[manualHistory.length - 1];
+  if (sampleTime >= last.time) return last.value;
+
+  let low = 0;
+  let high = manualHistory.length - 1;
+  while (high - low > 1) {
+    const mid = Math.floor((low + high) / 2);
+    if (manualHistory[mid].time <= sampleTime) low = mid;
+    else high = mid;
+  }
+
+  const before = manualHistory[low];
+  const after = manualHistory[high];
+  const ratio = (sampleTime - before.time) / Math.max(0.0001, after.time - before.time);
+  return before.value + (after.value - before.value) * ratio;
 }
 
 function clampDisplacement(value) {
@@ -118,23 +176,117 @@ function clampDisplacement(value) {
   return Math.max(-limit, Math.min(limit, value));
 }
 
-function pulseShape(type, progress) {
-  if (progress < 0 || progress > 1) return 0;
-  if (type === 'square') return 1;
-  if (type === 'triangle') return 1 - Math.abs(progress * 2 - 1);
-  if (type === 'sine') return Math.sin(2 * Math.PI * progress);
-  return Math.sin(Math.PI * progress);
+function oscillatorSourceAt(sampleTime) {
+  if (sampleTime < 0) return 0;
+
+  const amp = Number(amplitudeSlider.value);
+  const freq = Number(frequencySlider.value);
+  const rampDuration = Math.min(0.8, Math.max(0.18, 0.5 / Math.max(freq, 0.001)));
+  const ramp = Math.min(1, sampleTime / rampDuration);
+  const smoothRamp = ramp * ramp * (3 - 2 * ramp);
+  return amp * smoothRamp * Math.sin(2 * Math.PI * freq * sampleTime);
 }
 
-function pulseSample(type, center, width, position) {
+function manualDisplacement(position) {
+  if (state.source !== 'manual') return 0;
+
+  const x = position * gridSpacingMeters;
+  const damping = Number(dampingSlider.value) / 100;
+  const attenuation = Math.exp(-damping * x * 8);
+  const sourceAt = (delayMeters, speed = baseWaveSpeed) => sampleManualHistory(state.time - delayMeters / speed);
+
+  if (state.medium !== 'uniform') {
+    const interfaceX = ropeLengthMeters / 2;
+    const rightSpeed = state.medium === 'light-heavy' ? 0.58 : baseWaveSpeed;
+    const reflectedSign = state.medium === 'light-heavy' ? -1 : 1;
+
+    if (x < interfaceX) {
+      const incident = sourceAt(x);
+      const reflected = 0.42 * reflectedSign * sourceAt(2 * interfaceX - x);
+      return clampDisplacement((incident + reflected) * attenuation);
+    }
+
+    const incidentAtInterface = sourceAt(interfaceX + (x - interfaceX) * (baseWaveSpeed / rightSpeed));
+    return clampDisplacement(0.72 * incidentAtInterface * attenuation);
+  }
+
+  const incident = sourceAt(x);
+  if (state.boundary === 'absorbing') {
+    const fadeStart = ropeLengthMeters * 0.86;
+    const edge = x <= fadeStart ? 0 : (x - fadeStart) / (ropeLengthMeters - fadeStart);
+    return clampDisplacement(incident * attenuation * Math.max(0, 1 - edge * edge));
+  }
+
+  const reflectedSign = state.boundary === 'fixed' ? -1 : 1;
+  const reflected = reflectedSign * sourceAt(2 * ropeLengthMeters - x);
+  return clampDisplacement((incident + reflected) * attenuation);
+}
+
+function stepOscillatorRope(dt) {
+  let remaining = dt;
+  while (remaining > 0) {
+    const h = Math.min(simulationStep, remaining);
+    const damping = Number(dampingSlider.value) * 3.2;
+    const limit = Number(amplitudeSlider.value) * 2;
+
+    y[0] = oscillatorSourceAt(state.time);
+    yOld[0] = oscillatorSourceAt(Math.max(0, state.time - h));
+
+    for (let i = 1; i < points - 1; i += 1) {
+      const courant = (speeds[i] * h) / gridSpacingMeters;
+      const velocity = y[i] - yOld[i];
+      const curvature = y[i + 1] - 2 * y[i] + y[i - 1];
+      const next = 2 * y[i] - yOld[i] + courant * courant * curvature - damping * h * velocity;
+      yNew[i] = Math.max(-limit, Math.min(limit, next));
+    }
+
+    yNew[0] = oscillatorSourceAt(state.time + h);
+
+    if (state.medium === 'uniform' && state.boundary === 'absorbing') {
+      yNew[points - 1] = y[points - 2];
+    } else if (state.medium === 'uniform' && state.boundary === 'free') {
+      yNew[points - 1] = yNew[points - 2];
+    } else {
+      yNew[points - 1] = 0;
+    }
+
+    if (state.medium === 'uniform' && state.boundary === 'absorbing') {
+      const spongeStart = Math.floor(points * 0.82);
+      for (let i = spongeStart; i < points; i += 1) {
+        const edge = (i - spongeStart) / (points - spongeStart - 1);
+        const sponge = Math.max(0, 1 - edge * edge * 0.18);
+        yNew[i] *= sponge;
+      }
+    }
+
+    for (let i = 0; i < points; i += 1) {
+      yOld[i] = y[i];
+      y[i] = yNew[i];
+    }
+
+    state.time += h;
+    remaining -= h;
+  }
+}
+
+function pulseShape(type, progress, flipped = false) {
+  const sampleProgress = flipped ? 1 - progress : progress;
+  if (progress < 0 || progress > 1) return 0;
+  if (type === 'square') return 1;
+  if (type === 'triangle') return 1 - Math.abs(sampleProgress * 2 - 1);
+  if (type === 'sine') return Math.sin(2 * Math.PI * sampleProgress);
+  return Math.sin(Math.PI * sampleProgress);
+}
+
+function pulseSample(type, center, width, position, flipped = false) {
   const start = center - width / 2;
-  return pulseShape(type, (position - start) / width);
+  return pulseShape(type, (position - start) / width, flipped);
 }
 
 function idealPulseDisplacement(pulse, position) {
   const rightPoint = points - 1;
   const start = pulse.center - pulse.width / 2;
-  let value = pulse.amplitude * pulseShape(pulse.type, (position - start) / pulse.width);
+  let value = pulse.amplitude * pulseShape(pulse.type, (position - start) / pulse.width, pulse.flipped);
 
   if (
     state.medium === 'uniform'
@@ -143,15 +295,17 @@ function idealPulseDisplacement(pulse, position) {
     && pulse.center + pulse.width / 2 > rightPoint
   ) {
     const reflectionSign = state.boundary === 'fixed' ? -1 : 1;
-    value += pulse.amplitude * reflectionSign * pulseSample(pulse.type, pulse.center, pulse.width, 2 * rightPoint - position);
+    value += pulse.amplitude * reflectionSign * pulseSample(pulse.type, pulse.center, pulse.width, 2 * rightPoint - position, pulse.flipped);
   }
 
   return clampDisplacement(value);
 }
 
 function sendPulse(type) {
-  state.source = 'manual';
-  setActive(sourceButtons, sourceButtons.find((button) => button.dataset.source === 'manual'));
+  state.source = 'pulse';
+  state.pulseType = type;
+  setActive(sourceButtons, sourceButtons.find((button) => button.dataset.source === 'pulse'));
+  setActive(pulseButtons, pulseButtons.find((button) => button.dataset.pulse === type));
   y.fill(0);
   yOld.fill(0);
   yNew.fill(0);
@@ -165,8 +319,9 @@ function sendPulse(type) {
     width: type === 'square' ? 28 : 36,
     amplitude: Number(amplitudeSlider.value),
     direction: 1,
+    flipped: false,
     split: false,
-    speed: 44
+    speed: (baseWaveSpeed / ropeLengthMeters) * (points - 1)
   });
 }
 
@@ -177,7 +332,7 @@ function splitAtInterface(pulse, interfacePoint) {
 
   pulse.split = true;
   pulse.amplitude *= 0.72;
-  pulse.speed = lightToHeavy ? 28 : 44;
+  pulse.speed = ((lightToHeavy ? 0.58 : baseWaveSpeed) / ropeLengthMeters) * (points - 1);
 
   idealPulses.push({
     type: pulse.type,
@@ -185,8 +340,9 @@ function splitAtInterface(pulse, interfacePoint) {
     width: pulse.width,
     amplitude: pulse.amplitude * 0.42 * reflectedSign,
     direction: -1,
+    flipped: !pulse.flipped,
     split: true,
-    speed: lightToHeavy ? 44 : 28
+    speed: ((lightToHeavy ? baseWaveSpeed : 0.58) / ropeLengthMeters) * (points - 1)
   });
 }
 
@@ -200,6 +356,7 @@ function reflectAtRightEnd(pulse, rightPoint) {
 
   pulse.center = 2 * rightPoint - pulse.center;
   pulse.direction = -1;
+  pulse.flipped = !pulse.flipped;
   if (state.medium === 'uniform' && state.boundary === 'fixed') pulse.amplitude *= -1;
 }
 
@@ -223,39 +380,18 @@ function updateIdealPulses(dt) {
 }
 
 function step(dt) {
-  const safeDt = Math.min(dt, 1 / 35);
-  const damping = Number(dampingSlider.value) / 100;
-  const courant = 0.54;
-
-  y[0] = clampDisplacement(sourceDisplacement(safeDt));
-  yOld[0] = y[0];
-
-  for (let i = 1; i < points - 1; i += 1) {
-    const leftSpeed = (speeds[i - 1] + speeds[i]) * 0.5;
-    const rightSpeed = (speeds[i] + speeds[i + 1]) * 0.5;
-    const leftFlux = leftSpeed * leftSpeed * (y[i - 1] - y[i]);
-    const rightFlux = rightSpeed * rightSpeed * (y[i + 1] - y[i]);
-    const laplacian = courant * courant * (leftFlux + rightFlux);
-    yNew[i] = clampDisplacement((2 * y[i] - yOld[i] + laplacian) * (1 - damping));
+  if (state.source === 'manual') {
+    recordManualSource(clampDisplacement(sourceDisplacement(dt)));
+    state.time += dt;
+    return;
   }
 
-  if (state.medium === 'uniform' && state.boundary === 'absorbing') {
-    absorbRightEnd(0.42);
-  } else if (state.medium !== 'uniform') {
-    yNew[points - 1] = yNew[points - 2];
-    absorbRightEnd(0.08);
-  } else if (state.boundary === 'fixed') {
-    yNew[points - 1] = 0;
-  } else {
-    yNew[points - 1] = yNew[points - 2];
+  if (state.source === 'oscillator') {
+    stepOscillatorRope(dt);
+    return;
   }
 
-  for (let i = 0; i < points; i += 1) {
-    yOld[i] = clampDisplacement(y[i]);
-    y[i] = clampDisplacement(yNew[i]);
-  }
-
-  state.time += safeDt;
+  state.time += dt;
 }
 
 function drawSpring(sourceY, baseY, leftPad) {
@@ -315,10 +451,11 @@ function draw() {
 
   const displayY = new Float32Array(points);
   for (let i = 0; i < points; i += 1) {
-    let value = y[i];
+    let value = manualDisplacement(i) + y[i];
     for (const pulse of idealPulses) value += idealPulseDisplacement(pulse, i);
     displayY[i] = clampDisplacement(value);
   }
+  window.__ropeDebug = { displayY: Array.from(displayY), source: state.source, boundary: state.boundary };
 
   drawSpring(midY - displayY[0] * scale, midY, leftPad);
 
@@ -370,27 +507,31 @@ function draw() {
 
   ctx.fillStyle = '#edf5ff';
   ctx.font = '500 13px "Noto Sans TC", sans-serif';
-  ctx.fillText(state.source === 'manual' ? '拖曳波源' : '簡諧振源', 22, midY + 44);
+  const sourceLabel = state.source === 'oscillator'
+    ? '振盪源'
+    : state.source === 'pulse'
+      ? '脈波源'
+      : '手動源';
+  ctx.fillText(sourceLabel, 22, midY + 44);
 
   const boundaryLabel = state.medium !== 'uniform'
     ? '組合繩：反射＋穿透'
     : state.boundary === 'fixed'
       ? '固定端：反射倒相'
       : state.boundary === 'free'
-        ? '自由端：反射同相'
-        : '吸收端：單純傳播';
+        ? '鬆弛端：反射同相'
+        : '無邊界：單純傳播';
   ctx.fillStyle = '#b4c5d4';
   ctx.fillText(boundaryLabel, Math.max(leftPad, viewWidth - 220), viewHeight - 28);
 }
 
 function animate(stamp) {
   if (!state.lastStamp) state.lastStamp = stamp;
-  const dt = (stamp - state.lastStamp) / 1000;
+  const dt = Math.min((stamp - state.lastStamp) / 1000, 0.05);
   state.lastStamp = stamp;
 
   if (!state.paused) {
-    const iterations = 2;
-    for (let i = 0; i < iterations; i += 1) step(dt / iterations);
+    step(dt);
     updateIdealPulses(dt);
   }
 
@@ -410,6 +551,7 @@ sourceButtons.forEach((button) => {
     state.source = button.dataset.source;
     setActive(sourceButtons, button);
     resetRope();
+    if (state.source === 'pulse') sendPulse(state.pulseType);
   });
 });
 
@@ -427,6 +569,16 @@ pulseButtons.forEach((button) => {
   });
 });
 
+harmonicStepButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    applyHarmonicOrder(clampHarmonicOrder(harmonicOrderInput.value) + Number(button.dataset.harmonicStep));
+  });
+});
+
+harmonicOrderInput.addEventListener('input', updateHarmonicReadout);
+harmonicOrderInput.addEventListener('change', () => applyHarmonicOrder());
+applyHarmonicButton.addEventListener('click', () => applyHarmonicOrder());
+
 [amplitudeSlider, frequencySlider, dampingSlider].forEach((slider) => {
   slider.addEventListener('input', updateLabels);
 });
@@ -439,10 +591,13 @@ pauseButton.addEventListener('click', () => {
 });
 
 canvas.addEventListener('pointerdown', (event) => {
+  if (state.source !== 'manual') resetRope();
   state.source = 'manual';
   setActive(sourceButtons, sourceButtons.find((button) => button.dataset.source === 'manual'));
   state.dragging = true;
   state.manualTarget = pointerToDisplacement(event);
+  state.manualValue = state.manualTarget;
+  recordManualSource(clampDisplacement(state.manualValue));
   canvas.setPointerCapture(event.pointerId);
 });
 
@@ -467,4 +622,5 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 updateLabels();
 updateMedium();
+setActive(pulseButtons, pulseButtons.find((button) => button.dataset.pulse === state.pulseType));
 requestAnimationFrame(animate);
