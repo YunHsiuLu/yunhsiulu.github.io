@@ -25,16 +25,31 @@
       </div>
 
       <aside class="controls">
+        <div class="button-row" aria-label="動畫播放控制">
+          <button id="play" type="button" class="control-button">播放</button>
+          <button id="pause" type="button" class="control-button">暫停</button>
+          <button id="stepFrame" type="button" class="control-button">單影格</button>
+        </div>
+
         <label>
           顯示模式
           <select id="mode">
             <option value="transverse">橫波：上下振動</option>
-            <option value="longitudinal">縱波：左右振動</option>
+            <option value="longitudinal">縱波：管內聲波</option>
           </select>
         </label>
 
         <label>
-          諧波數 n
+          邊界條件
+          <select id="boundary">
+            <option value="closed-closed">兩邊節點（雙閉）</option>
+            <option value="open-open">兩邊腹點（雙開）</option>
+            <option value="closed-open">左節點、右腹點（一閉一開）</option>
+          </select>
+        </label>
+
+        <label>
+          模態序號 n
           <input id="harmonic" type="range" min="1" max="6" step="1" value="2">
           <output id="harmonicValue">2</output>
         </label>
@@ -55,21 +70,43 @@
           <input id="components" type="checkbox" checked>
           顯示兩個反向行進波
         </label>
+
+        <label class="check">
+          <input id="standing" type="checkbox" checked>
+          顯示駐波
+        </label>
+
+        <label class="check">
+          <input id="guides" type="checkbox" checked>
+          顯示腹點／節點輔助線
+        </label>
+
+        <div id="longitudinalOptions" class="longitudinal-options" hidden>
+          <span>縱波橫向表示</span>
+          <label class="check">
+            <input id="pressurePlot" type="checkbox" checked>
+            顯示氣壓分布圖
+          </label>
+          <label class="check">
+            <input id="displacementPlot" type="checkbox" checked>
+            顯示分子位移圖
+          </label>
+        </div>
       </aside>
     </section>
 
     <section class="notes" aria-label="教學提示">
       <article>
         <h2>波節</h2>
-        <p>振幅永遠為零的位置。固定端繩波、管內聲波都可以用波節位置判斷允許的波長。</p>
+        <p>聲波的位移波節同時是氣壓波腹；封閉端屬於位移波節。</p>
       </article>
       <article>
         <h2>波腹</h2>
-        <p>振幅最大的區域。縱波的波腹不是「上下最高」，而是粒子左右位移最大。</p>
+        <p>聲波的位移波腹同時是氣壓波節；開口端屬於位移波腹。</p>
       </article>
       <article>
         <h2>關鍵式</h2>
-        <p>固定兩端時，弦長 L 內可容納 n 個半波長：<strong>L = nλ / 2</strong>。</p>
+        <p>雙閉、雙開時：<strong>L = nλ / 2</strong>；一閉一開時：<strong>L = (2n − 1)λ / 4</strong>。</p>
       </article>
     </section>
   </main>

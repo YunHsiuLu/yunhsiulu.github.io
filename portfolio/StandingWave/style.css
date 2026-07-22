@@ -92,6 +92,28 @@ canvas { display:block; width:100%; height:auto; border-radius:10px; background:
   border-radius:14px;
 }
 
+.button-row {
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:10px;
+}
+.control-button {
+  min-height:42px;
+  color:var(--ink);
+  border:1px solid rgba(86,217,233,.45);
+  border-radius:8px;
+  background:#0a2235;
+  font:700 15px/1 "Noto Sans TC", system-ui, sans-serif;
+  cursor:pointer;
+}
+.control-button:hover { border-color:var(--cyan); background:#0d2a42; }
+.control-button:active { transform:translateY(1px); }
+.control-button.is-active {
+  color:#07111f;
+  border-color:var(--lime);
+  background:var(--lime);
+}
+
 label { display:grid; gap:8px; color:#d8e7f5; font-weight:700; }
 select, input[type="range"] { width:100%; }
 select {
@@ -104,6 +126,9 @@ select {
 output { color:var(--lime); font:700 18px/1 "Space Grotesk", system-ui, sans-serif; }
 .check { grid-template-columns:auto 1fr; align-items:center; font-weight:600; color:var(--muted); }
 .check input { width:18px; height:18px; accent-color:var(--cyan); }
+.longitudinal-options { display:grid; gap:10px; padding-top:2px; }
+.longitudinal-options > span { color:#d8e7f5; font-weight:700; }
+.longitudinal-options[hidden] { display:none; }
 
 .notes {
   display:grid;
