@@ -42,10 +42,14 @@
         </div>
         <div class="subject-group">
           <h3>學測用於分發的60級分</h3>
-          <p class="helper">請填招生分發使用的60級分，不是原始15級分。</p>
-          <div class="input-grid compact-inputs">
+          <p class="helper">請填招生分發使用的60級分，不是成績單上的15級分。系統會依60級分自動對應15級分，判斷校系的學測檢定門檻。</p>
+          <div class="input-grid gsat-inputs">
             <label>國文<input inputmode="decimal" type="number" id="score-chinese" data-subject="國" min="0" max="60" step="0.01" placeholder="0～60"></label>
             <label>英文<input inputmode="decimal" type="number" id="score-english" data-subject="英" min="0" max="60" step="0.01" placeholder="0～60"></label>
+            <label>數學A<input inputmode="decimal" type="number" id="score-math-a-gsat" data-subject="A" min="0" max="60" step="0.01" placeholder="0～60"></label>
+            <label>數學B<input inputmode="decimal" type="number" id="score-math-b-gsat" data-subject="B" min="0" max="60" step="0.01" placeholder="0～60"></label>
+            <label>社會<input inputmode="decimal" type="number" id="score-social" data-subject="社" min="0" max="60" step="0.01" placeholder="0～60"></label>
+            <label>自然<input inputmode="decimal" type="number" id="score-science" data-subject="自" min="0" max="60" step="0.01" placeholder="0～60"></label>
           </div>
         </div>
         <p class="form-error" id="form-error" role="alert" hidden></p>
@@ -79,6 +83,22 @@
         <span id="school-count"></span>
       </div>
       <div class="school-options" id="school-options"></div>
+    </section>
+
+    <section class="panel" aria-labelledby="major-title">
+      <div class="section-heading">
+        <div>
+          <p class="step">步驟三</p>
+          <h2 id="major-title">選擇希望參考的科系</h2>
+        </div>
+        <div class="small-actions">
+          <button type="button" class="text-button" id="select-all-majors">全部勾選</button>
+          <button type="button" class="text-button" id="clear-all-majors">取消勾選</button>
+        </div>
+      </div>
+      <p class="helper major-helper">可複選科系類別；每個系組只歸入最主要的一類，右側數字為目前資料庫收錄的系組數。</p>
+      <div class="major-options" id="major-options"></div>
+      <p class="major-count" id="major-count" aria-live="polite"></p>
       <div class="primary-actions">
         <button type="button" class="primary-button" id="calculate-button">開始計算</button>
         <button type="button" class="secondary-button" id="reset-button">清除成績</button>
@@ -122,7 +142,7 @@
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>區間</th><th>校系代碼／校系</th><th>採計式</th><th>個案加權</th><th>114最低</th><th>差距</th><th>差距率</th></tr>
+            <tr><th>區間</th><th>校系代碼／校系</th><th>採計式／學測檢定</th><th>個案加權</th><th>114最低</th><th>差距</th><th>差距率</th></tr>
           </thead>
           <tbody id="program-body"></tbody>
         </table>
@@ -132,6 +152,12 @@
         <summary><span>資料不足的系組</span><strong id="missing-count">0</strong></summary>
         <p>下列系組需要尚未輸入的科目，因此不會硬分入四區。</p>
         <div id="missing-list" class="missing-list"></div>
+      </details>
+
+      <details class="missing-panel ineligible-panel" id="ineligible-panel">
+        <summary><span>未通過學測檢定的系組</span><strong id="ineligible-count">0</strong></summary>
+        <p>下列系組的學測15級分檢定門檻未通過，因此不列入四區。</p>
+        <div id="ineligible-list" class="missing-list"></div>
       </details>
     </section>
 
